@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import questions from '../data/questions';
 
 function QuizPage() {
+  const { faculty, course, quiz } = useParams();
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
@@ -23,7 +24,7 @@ function QuizPage() {
         setSelectedId(null);
         setIsCorrectAnswer(null);
       } else {
-        navigate('/results', { state: { score: opt.isCorrect ? score + 1 : score } });
+        navigate(`/faculties/${faculty}/courses/${course}/difficulty/${quiz}/results`, { state: { score: opt.isCorrect ? score + 1 : score } });
       }
     }, 700);
   };
@@ -32,7 +33,6 @@ function QuizPage() {
 
   return (
     <div className="page">
-      {/* Progress bar */}
       <div style={{
         height: '10px',
         width: '100%',
