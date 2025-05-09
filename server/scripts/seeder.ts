@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { faker } from "@faker-js/faker";
 import { CourseModel } from "@/modules/Course/model";
 import { FacultyModel } from "@/modules/Faculty/model";
@@ -29,33 +29,36 @@ async function seed() {
           faculty: faculty._id,
         });
 
-        const quiz = await QuizModel.create({
-          name: faker.lorem.words(3),
-          description: faker.lorem.sentence(),
-          course: course._id,
-        });
-
-        for (let q = 0; q < 5; q++) {
-          const correctAnswer = faker.word.noun();
-          const options = [
-            ...Array.from({ length: 3 }, () => ({
-              text: faker.word.noun(),
-              isCorrect: false,
-            })),
-            {
-              text: correctAnswer,
-              isCorrect: true,
-            },
-          ];
-
-          // shuffle
-          const shuffled = options.sort(() => 0.5 - Math.random());
-
-          await QuestionModel.create({
-            question: faker.lorem.sentence(),
-            quiz: quiz._id,
-            options: shuffled,
+        for (let qz = 0; qz < 2; qz++) {
+          const quiz = await QuizModel.create({
+            name: faker.lorem.words(3),
+            description: faker.lorem.sentence(),
+            course: course._id,
+            difficulty: faker.helpers.arrayElement(["easy", "medium", "hard"]),
           });
+
+          for (let q = 0; q < 5; q++) {
+            const correctAnswer = faker.word.noun();
+            const options = [
+              ...Array.from({ length: 3 }, () => ({
+                text: faker.word.noun(),
+                isCorrect: false,
+              })),
+              {
+                text: correctAnswer,
+                isCorrect: true,
+              },
+            ];
+
+            // shuffle
+            const shuffled = options.sort(() => 0.5 - Math.random());
+
+            await QuestionModel.create({
+              question: faker.lorem.sentence(),
+              quiz: quiz._id,
+              options: shuffled,
+            });
+          }
         }
       }
     }
