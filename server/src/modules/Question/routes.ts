@@ -21,5 +21,10 @@ questionRouter.get(
   c.solveQuestion.validator,
   c.solveQuestion.handler
 );
-
+questionRouter.post(
+  "/quiz/:quizId/solve",
+  authMiddleware, // Protect this route
+  c.solveAllQuestions.validator,
+  c.solveAllQuestions.handler
+);
 export default questionRouter;
