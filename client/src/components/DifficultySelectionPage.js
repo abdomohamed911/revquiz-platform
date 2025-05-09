@@ -1,8 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function DifficultySelectionPage() {
   const navigate = useNavigate();
+  const { faculty, course } = useParams();
 
   const difficulties = [
     { level: "Easy", color: "easy", icon: "🍃" },
@@ -11,7 +12,7 @@ function DifficultySelectionPage() {
   ];
 
   const handleSelect = (level) => {
-    navigate('/quiz');
+    navigate(`/faculties/${faculty}/courses/${course}/difficulty/${level}/quizzes/quiz1`);
   };
 
   return (
