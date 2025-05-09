@@ -5,14 +5,30 @@ import ApiError from "@/common/utils/api/ApiError";
 import { body, param } from "express-validator";
 import validatorMiddleware from "@/common/middleware/validators/validator";
 import ApiSuccess from "@/common/utils/api/ApiSuccess";
+import { Request } from "express";
+
+// Extend the Request interface to include the user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any; // Replace 'any' with the appropriate user type if available
+    }
+  }
+}
 
 export const questionController = {
   ...baseController(QuestionModel),
   solveQuestion: {
-    handler: expressAsyncHandler(async (req, res, next) => {
+    handler: expressAsyncHandler(async (req , res, next) => {
       try {
         const { id } = req.params;
         const { answer } = req.body;
+
+        // Access authenticated user info
+        const user = req.user as any ; // Type assertion to access user properties
+        if (!user) {
+          return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
+        }
 
         const question = await QuestionModel.findById(id);
         if (!question) {

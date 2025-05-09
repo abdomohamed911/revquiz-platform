@@ -9,6 +9,7 @@ import ApiError from "./common/utils/api/ApiError";
 import courseRouter from "./modules/Course/routes";
 import quizRouter from "./modules/Quiz/routes";
 import questionRouter from "./modules/Question/routes";
+import { authRouter } from "./modules/User/routes";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/faculties", facultyRouter);
 app.use("/courses", courseRouter);
 app.use("/quizzes", quizRouter);
 app.use("/questions", questionRouter);
+app.use("/auth", authRouter);
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError("Route not found", "NOT_FOUND"));
 });
