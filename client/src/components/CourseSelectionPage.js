@@ -15,8 +15,7 @@ function CourseSelectionPage() {
   const courses = courseData[faculty] || [];
 
   const handleCourseSelect = (course) => {
-    // Save if needed later
-    navigate('/difficulty');
+    navigate(`/faculties/${faculty}/courses/${course}/quizzes/quiz1`);
   };
 
   return (

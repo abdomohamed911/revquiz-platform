@@ -5,11 +5,11 @@ function FacultySelectionPage() {
   const navigate = useNavigate();
 
   const faculties = [
-    { name: "Engineering", path: "/courses/engineering", icon: "🧠" },
-    { name: "Business", path: "/courses/business", icon: "🏆" },
-    { name: "Medicine", path: "/courses/medicine", icon: "📚" },
-    { name: "Arts", path: "/courses/arts", icon: "🎓" },
-    { name: "Science", path: "/courses/science", icon: "🧠" }
+    { name: "Engineering", path: "/faculties/engineering/courses", icon: "🧠" },
+    { name: "Business", path: "/faculties/business/courses", icon: "🏆" },
+    { name: "Medicine", path: "/faculties/medicine/courses", icon: "📚" },
+    { name: "Arts", path: "/faculties/arts/courses", icon: "🎓" },
+    { name: "Science", path: "/faculties/science/courses", icon: "🧠" }
   ];
 
   return (
