@@ -1,8 +1,10 @@
+// filepath: e:\IT\Coding\Projects\College projects\3th\WebPrograming\RevQuiz\server\src\common\middleware\auth\index.ts
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import ApiError from "@/common/utils/api/ApiError";
+import { UserModel } from "@/modules/User/model";
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,8 +16,17 @@ export const authMiddleware = (
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!); // Ensure `JWT_SECRET` is set in `.env`
-    req.user = decoded; // Attach user info to the request object
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: string;
+    };
+
+    // Fetch the user from the database
+    const user = await UserModel.findById(decoded.id);
+    if (!user) {
+      throw new ApiError("User not found", "UNAUTHORIZED");
+    }
+
+    req.user = user; // Attach user to the request object
     next();
   } catch (error) {
     next(new ApiError("Invalid or expired token", "UNAUTHORIZED"));

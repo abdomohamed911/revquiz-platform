@@ -5,7 +5,7 @@ import ApiError from "@/common/utils/api/ApiError";
 import { body, param } from "express-validator";
 import validatorMiddleware from "@/common/middleware/validators/validator";
 import ApiSuccess from "@/common/utils/api/ApiSuccess";
-import { Request } from "express";
+import UserModel from "../User/model";
 
 // Extend the Request interface to include the user property
 declare global {
@@ -25,7 +25,7 @@ export const questionController = {
         const { answer } = req.body;
 
         // Access authenticated user info
-        const user = req.user as any; // Type assertion to access user properties
+        const user = req.user; // Type assertion to access user properties
         if (!user) {
           return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
         }
@@ -47,10 +47,22 @@ export const questionController = {
           return next(new ApiError("Answer not found", "NOT_FOUND"));
         }
 
+        // Update user score
+        const isCorrect = matchedOption.isCorrect;
+        if (isCorrect) {
+          await UserModel.findByIdAndUpdate(user._id, {
+            $inc: { "score.questions.passed": 1 },
+          });
+        } else {
+          await UserModel.findByIdAndUpdate(user._id, {
+            $inc: { "score.questions.failed": 1 },
+          });
+        }
+
         // Send success response
         res.status(200).json(
           new ApiSuccess("OK", "correct answer", {
-            isCorrect: matchedOption.isCorrect,
+            isCorrect,
             question: question.question,
             answer: matchedOption.text,
           })
@@ -127,11 +139,40 @@ export const questionController = {
           };
         });
 
+        // Calculate percentage
+        const totalQuestions = questions.length;
+        const percentage = (correctCount / totalQuestions) * 100;
+
+        // Update user score
+        const user = req.user as any;
+        if (!user) {
+          return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
+        }
+
+        if (percentage >= 50) {
+          await UserModel.findByIdAndUpdate(user._id, {
+            $inc: { "score.quizzes.passed": 1 },
+          });
+        } else {
+          await UserModel.findByIdAndUpdate(user._id, {
+            $inc: { "score.quizzes.failed": 1 },
+          });
+        }
+
+        // Update question scores
+        await UserModel.findByIdAndUpdate(user._id, {
+          $inc: {
+            "score.questions.passed": correctCount,
+            "score.questions.failed": totalQuestions - correctCount,
+          },
+        });
+
         // Send the result
         res.status(200).json(
           new ApiSuccess("OK", "Quiz solved successfully", {
-            totalQuestions: questions.length,
+            totalQuestions,
             correctAnswers: correctCount,
+            percentage,
             results,
           })
         );

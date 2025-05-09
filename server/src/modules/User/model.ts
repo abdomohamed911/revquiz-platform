@@ -1,10 +1,21 @@
 // filepath: e:\IT\Coding\Projects\College projects\3th\WebPrograming\RevQuiz\server\src\modules\User\model.ts
 import mongoose, { Schema, Document, Model } from "mongoose";
 import bcrypt from "bcryptjs";
+import { PassThrough } from "stream";
 
 export interface IUser extends Document {
   email: string;
   password: string;
+  score: {
+    quizzes: {
+      passed: number;
+      failed: number;
+    };
+    questions: {
+      passed: number;
+      failed: number;
+    };
+  };
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -20,6 +31,28 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: true,
     minlength: 6,
+  },
+  score: {
+    quizzes: {
+      passed: {
+        type: Number,
+        default: 0,
+      },
+      failed: {
+        type: Number,
+        default: 0,
+      },
+    },
+    questions: {
+      passed: {
+        type: Number,
+        default: 0,
+      },
+      failed: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
 });
 
