@@ -6,6 +6,7 @@ import facultyRouter from "./modules/Faculty/routes";
 import dbConnection from "./common/config/database.config";
 import globalError from "./common/middleware/globalError";
 import ApiError from "./common/utils/api/ApiError";
+import courseRouter from "./modules/Course/routes";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 dbConnection.connect();
 
 app.use("/faculties", facultyRouter);
+app.use("/courses", courseRouter);
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError("Route not found", "NOT_FOUND"));
 });
