@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function ResultPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const score = location.state?.score ?? 0;
+  const { score } = location.state || {};
 
   return (
     <div className="page">
@@ -16,7 +16,7 @@ function ResultPage() {
         </div>
         <p><strong>{score} / 5</strong></p>
       </div>
-      <button onClick={() => navigate('/quiz')}>🔁 Try Again</button>
+      <button onClick={() => navigate('/faculties/business/courses/Marketing/difficulty/Easy/quizzes/quiz1')}>🔁 Try Again</button>
       <button onClick={() => navigate('/')}>🏠 Go Home</button>
     </div>
   );
