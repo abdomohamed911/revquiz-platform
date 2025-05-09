@@ -7,6 +7,7 @@ import dbConnection from "./common/config/database.config";
 import globalError from "./common/middleware/globalError";
 import ApiError from "./common/utils/api/ApiError";
 import courseRouter from "./modules/Course/routes";
+import quizRouter from "./modules/Quiz/routes";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ dbConnection.connect();
 
 app.use("/faculties", facultyRouter);
 app.use("/courses", courseRouter);
+app.use("/quizzes", quizRouter);
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError("Route not found", "NOT_FOUND"));
 });
