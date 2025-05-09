@@ -51,11 +51,10 @@ const globalError = (
   err: ErrorType,
   _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction // Remove the call to next()
 ): void => {
   const error = ErrorHandler.handleError(err);
   error.send(res);
-  next();
 };
 
 export default globalError;
