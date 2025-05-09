@@ -12,5 +12,9 @@ questionRouter
     .get(c.getOne.validator, c.getOne.handler)
     .put(c.update.validator, c.update.handler)
     .delete(c.deleteOne.validator, c.deleteOne.handler);
-
+questionRouter.get(
+  "/:id/solve",
+  c.solveQuestion.validator,
+  c.solveQuestion.handler
+);
 export default questionRouter;

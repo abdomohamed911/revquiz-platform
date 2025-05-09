@@ -4,36 +4,44 @@ import expressAsyncHandler from "express-async-handler";
 import ApiError from "@/common/utils/api/ApiError";
 import { body, param } from "express-validator";
 import validatorMiddleware from "@/common/middleware/validators/validator";
+import ApiSuccess from "@/common/utils/api/ApiSuccess";
 
 export const questionController = {
   ...baseController(QuestionModel),
-
   solveQuestion: {
-    handler: expressAsyncHandler(async (req, res) => {
-      const { id } = req.params;
-      const { answer } = req.body;
+    handler: expressAsyncHandler(async (req, res, next) => {
+      try {
+        const { id } = req.params;
+        const { answer } = req.body;
 
-      const question = await QuestionModel.findById(id);
-      if (!question) {
-        throw new ApiError("Question not found", "NOT_FOUND");
+        const question = await QuestionModel.findById(id);
+        if (!question) {
+          return next(new ApiError("Question not found", "NOT_FOUND"));
+        }
+
+        // Normalize answer (trim and lowercase)
+        const normalizedUserAnswer = answer.trim().toLowerCase();
+
+        // Find matching option
+        const matchedOption = question.options.find(
+          (opt) => opt.text.trim().toLowerCase() === normalizedUserAnswer
+        );
+
+        if (!matchedOption) {
+          return next(new ApiError("Answer not found", "NOT_FOUND"));
+        }
+
+        // Send success response
+        res.status(200).json(
+          new ApiSuccess("OK", "correct answer", {
+            isCorrect: matchedOption.isCorrect,
+            question: question.question,
+            answer: matchedOption.text,
+          })
+        );
+      } catch (error) {
+        next(error); // Pass any unexpected errors to the error handler
       }
-
-      // Normalize answer (trim and lowercase)
-      const normalizedUserAnswer = answer.trim().toLowerCase();
-
-      // Find matching option
-      const matchedOption = question.options.find(
-        (opt) => opt.text.trim().toLowerCase() === normalizedUserAnswer
-      );
-
-      if (!matchedOption) {
-        res
-          .status(400)
-          .json({ isCorrect: false, message: "Invalid answer option" });
-        return;
-      }
-
-      res.json({ isCorrect: matchedOption.isCorrect });
     }),
 
     validator: [
