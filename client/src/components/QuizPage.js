@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import questions from '../data/questions';
 
 function QuizPage() {
-  const { faculty, course, quiz } = useParams();
+  const { faculty, course, difficulty, quiz } = useParams();
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
@@ -24,7 +24,7 @@ function QuizPage() {
         setSelectedId(null);
         setIsCorrectAnswer(null);
       } else {
-        navigate(`/faculties/${faculty}/courses/${course}/difficulty/${quiz}/results`, { state: { score: opt.isCorrect ? score + 1 : score } });
+        navigate(`/faculties/${faculty}/courses/${course}/difficulty/${difficulty}/quizzes/${quiz}/results`, { state: { score: opt.isCorrect ? score + 1 : score } });
       }
     }, 700);
   };

@@ -15,7 +15,8 @@ function CourseSelectionPage() {
   const courses = courseData[faculty] || [];
 
   const handleCourseSelect = (course) => {
-    navigate(`/faculties/${faculty}/courses/${course}/quizzes/quiz1`);
+    const formattedCourse = course.replace(/\s+/g, ''); // I just use it to remove spaces from the url
+    navigate(`/faculties/${faculty}/courses/${formattedCourse}/difficulty`);
   };
 
   return (
