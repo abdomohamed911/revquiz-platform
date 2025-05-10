@@ -19,6 +19,10 @@ function SignupPage() {
       localStorage.setItem("token", token);
       navigate("/"); // Redirect to home or dashboard
     } catch (err) {
+        if (err.response?.status === 400) {
+          setError("Invalid email or password.");
+          return;
+        }
       setError(
         err.response?.data?.message || "Signup failed. Please try again."
       );
