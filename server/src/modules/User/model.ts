@@ -1,19 +1,41 @@
-// filepath: e:\IT\Coding\Projects\College projects\3th\WebPrograming\RevQuiz\server\src\modules\User\model.ts
 import mongoose, { Schema, Document, Model } from "mongoose";
 import bcrypt from "bcryptjs";
-import { PassThrough } from "stream";
 
 export interface IUser extends Document {
   email: string;
   password: string;
   score: {
     quizzes: {
-      passed: number;
-      failed: number;
+      passed: {
+        count: number;
+        quizzes: Array<{
+          id: Schema.Types.ObjectId;
+          name: string;
+        }>;
+      };
+      failed: {
+        count: number;
+        quizzes: Array<{
+          id: Schema.Types.ObjectId;
+          name: string;
+        }>;
+      };
     };
     questions: {
-      passed: number;
-      failed: number;
+      passed: {
+        count: number;
+        questions: Array<{
+          id: Schema.Types.ObjectId;
+          text: string;
+        }>;
+      };
+      failed: {
+        count: number;
+        questions: Array<{
+          id: Schema.Types.ObjectId;
+          text: string;
+        }>;
+      };
     };
   };
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -35,22 +57,74 @@ const UserSchema = new Schema<IUser>({
   score: {
     quizzes: {
       passed: {
-        type: Number,
-        default: 0,
+        count: {
+          type: Number,
+          default: 0,
+        },
+        quizzes: [
+          {
+            id: {
+              type: Schema.Types.ObjectId,
+              ref: "Quiz",
+            },
+            name: {
+              type: String,
+            },
+          },
+        ],
       },
       failed: {
-        type: Number,
-        default: 0,
+        count: {
+          type: Number,
+          default: 0,
+        },
+        quizzes: [
+          {
+            id: {
+              type: Schema.Types.ObjectId,
+              ref: "Quiz",
+            },
+            name: {
+              type: String,
+            },
+          },
+        ],
       },
     },
     questions: {
       passed: {
-        type: Number,
-        default: 0,
+        count: {
+          type: Number,
+          default: 0,
+        },
+        questions: [
+          {
+            id: {
+              type: Schema.Types.ObjectId,
+              ref: "Question",
+            },
+            text: {
+              type: String,
+            },
+          },
+        ],
       },
       failed: {
-        type: Number,
-        default: 0,
+        count: {
+          type: Number,
+          default: 0,
+        },
+        questions: [
+          {
+            id: {
+              type: Schema.Types.ObjectId,
+              ref: "Question",
+            },
+            text: {
+              type: String,
+            },
+          },
+        ],
       },
     },
   },
@@ -69,6 +143,19 @@ UserSchema.methods.comparePassword = async function (
 ) {
   return bcrypt.compare(candidatePassword, this.password);
 };
+
+// Virtual field for overall score
+UserSchema.virtual("score.overall").get(function () {
+  const quizzesPassed = this.score.quizzes.passed.count || 0;
+  const quizzesFailed = this.score.quizzes.failed.count || 0;
+  const questionsPassed = this.score.questions.passed.count || 0;
+  const questionsFailed = this.score.questions.failed.count || 0;
+
+  return {
+    passed: quizzesPassed + questionsPassed,
+    failed: quizzesFailed + questionsFailed,
+  };
+});
 
 export const UserModel: Model<IUser> = mongoose.model<IUser>(
   "User",

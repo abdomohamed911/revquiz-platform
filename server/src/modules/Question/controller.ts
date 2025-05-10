@@ -25,7 +25,7 @@ export const questionController = {
         const { answer } = req.body;
 
         // Access authenticated user info
-        const user = req.user; // Type assertion to access user properties
+        const user = req.user; // Authenticated user
         if (!user) {
           return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
         }
@@ -51,17 +51,29 @@ export const questionController = {
         const isCorrect = matchedOption.isCorrect;
         if (isCorrect) {
           await UserModel.findByIdAndUpdate(user._id, {
-            $inc: { "score.questions.passed": 1 },
+            $inc: { "score.questions.passed.count": 1 },
+            $push: {
+              "score.questions.passed.questions": {
+                id: question._id,
+                text: question.question,
+              },
+            },
           });
         } else {
           await UserModel.findByIdAndUpdate(user._id, {
-            $inc: { "score.questions.failed": 1 },
+            $inc: { "score.questions.failed.count": 1 },
+            $push: {
+              "score.questions.failed.questions": {
+                id: question._id,
+                text: question.question,
+              },
+            },
           });
         }
 
         // Send success response
         res.status(200).json(
-          new ApiSuccess("OK", "correct answer", {
+          new ApiSuccess("OK", "Question solved successfully", {
             isCorrect,
             question: question.question,
             answer: matchedOption.text,
@@ -151,19 +163,45 @@ export const questionController = {
 
         if (percentage >= 50) {
           await UserModel.findByIdAndUpdate(user._id, {
-            $inc: { "score.quizzes.passed": 1 },
+            $inc: { "score.quizzes.passed.count": 1 },
+            $push: {
+              "score.quizzes.passed.quizzes": {
+                id: quizId,
+                name: "Quiz Name Here", // Replace with actual quiz name if available
+              },
+            },
           });
         } else {
           await UserModel.findByIdAndUpdate(user._id, {
-            $inc: { "score.quizzes.failed": 1 },
+            $inc: { "score.quizzes.failed.count": 1 },
+            $push: {
+              "score.quizzes.failed.quizzes": {
+                id: quizId,
+                name: "Quiz Name Here", // Replace with actual quiz name if available
+              },
+            },
           });
         }
 
         // Update question scores
         await UserModel.findByIdAndUpdate(user._id, {
           $inc: {
-            "score.questions.passed": correctCount,
-            "score.questions.failed": totalQuestions - correctCount,
+            "score.questions.passed.count": correctCount,
+            "score.questions.failed.count": totalQuestions - correctCount,
+          },
+          $push: {
+            "score.questions.passed.questions": questions
+              .filter((q, i) => results[i].isCorrect)
+              .map((q) => ({
+                id: q._id,
+                text: q.question,
+              })),
+            "score.questions.failed.questions": questions
+              .filter((q, i) => !results[i].isCorrect)
+              .map((q) => ({
+                id: q._id,
+                text: q.question,
+              })),
           },
         });
 
