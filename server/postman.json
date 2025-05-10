@@ -1,14 +1,140 @@
 {
 	"info": {
-		"_postman_id": "7fb72b54-f522-4551-a7a9-fc71babf6ede",
-		"name": "RevQuiz API",
-		"description": "Postman collection to test the RevQuiz API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39432797"
+		"_postman_id": "revquiz-docs-2025",
+		"name": "RevQuiz API (Documented)",
+		"description": "Comprehensive documentation for the RevQuiz API. Includes authentication, faculties, courses, quizzes, questions, and user profile endpoints. All protected endpoints require a Bearer JWT token in the Authorization header.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	],
 	"item": [
 		{
+			"name": "Auth",
+			"description": "User authentication endpoints for sign up and login.",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {},
+							"status": "Created",
+							"code": 201,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"userId\": \"...\",\n    \"token\": \"...\"\n  }\n}"
+						}
+					],
+					"description": "Register a new user. Returns a JWT token on success."
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"User logged in successfully\",\n  \"data\": {\n    \"userId\": \"...\",\n    \"token\": \"...\"\n  }\n}"
+						}
+					],
+					"description": "Login with email and password. Returns a JWT token on success."
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "User profile and management endpoints.",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"User profile fetched successfully\",\n  \"data\": {\n    \"_id\": \"...\",\n    \"email\": \"user1@example.com\",\n    \"score\": {\n      \"quizzes\": { \"passed\": { \"count\": 0, \"quizzes\": [] }, \"failed\": { \"count\": 0, \"quizzes\": [] } },\n      \"questions\": { \"passed\": { \"count\": 0, \"questions\": [] }, \"failed\": { \"count\": 0, \"questions\": [] } }\n    }\n  }\n}"
+						}
+					],
+					"description": "Get the authenticated user's profile. Requires a valid JWT token."
+				}
+			]
+		},
+		{
 			"name": "Faculties",
+			"description": "Endpoints for managing faculties.",
 			"item": [
 				{
 					"name": "Get All Faculties",
@@ -25,7 +151,16 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"documents found\",\n  \"data\": {\n    \"data\": [ { \"_id\": \"...\", \"name\": \"...\" } ],\n    \"pagination\": { \"currentPage\": 1, \"limit\": 20, \"totalPages\": 1, \"totalResults\": 3 }\n  }\n}"
+						}
+					],
+					"description": "Get a list of all faculties."
 				},
 				{
 					"name": "Create Faculty",
@@ -51,29 +186,146 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Create a new faculty."
+				},
+				{
+					"name": "Get Faculty By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty found\",\n  \"data\": { \"_id\": \"...\", \"name\": \"...\" }\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Get a faculty by its ID."
+				},
+				{
+					"name": "Update Faculty",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Faculty Name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty updated\",\n  \"data\": { \"_id\": \"...\", \"name\": \"Updated Faculty Name\" }\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Update a faculty by its ID."
+				},
+				{
+					"name": "Delete Faculty",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty deleted\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Delete a faculty by its ID."
 				}
 			]
 		},
 		{
 			"name": "Courses",
+			"description": "Endpoints for managing courses.",
 			"item": [
 				{
 					"name": "Get All Courses",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filters\":{\r\n        \"faculty\":\"681e17ba2700f4d75fbea098\"\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n  \"filters\": { \"faculty\": \"FACULTY_ID\" }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/courses",
@@ -85,7 +337,8 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Get all courses. Optionally filter by faculty."
 				},
 				{
 					"name": "Create Course",
@@ -99,7 +352,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Mathematics\",\n  \"faculty\": \"faculty_id_here\"\n}"
+							"raw": "{\n  \"name\": \"Mathematics\",\n  \"faculty\": \"FACULTY_ID\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/courses",
@@ -111,29 +364,23 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Create a new course. Requires faculty ID."
 				}
 			]
 		},
 		{
 			"name": "Quizzes",
+			"description": "Endpoints for managing quizzes.",
 			"item": [
 				{
 					"name": "Get All Quizzes",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filters\":{\r\n        \"course\":\"681e17ba2700f4d75fbea0bf\"\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n  \"filters\": { \"course\": \"COURSE_ID\" }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/quizzes",
@@ -145,7 +392,8 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Get all quizzes. Optionally filter by course."
 				},
 				{
 					"name": "Create Quiz",
@@ -159,7 +407,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Quiz 1\",\n  \"course\": \"course_id_here\"\n}"
+							"raw": "{\n  \"name\": \"Quiz 1\",\n  \"course\": \"COURSE_ID\",\n  \"difficulty\": \"easy\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/quizzes",
@@ -171,29 +419,23 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Create a new quiz. Requires course ID and difficulty."
 				}
 			]
 		},
 		{
 			"name": "Questions",
+			"description": "Endpoints for managing and solving questions.",
 			"item": [
 				{
 					"name": "Get All Questions",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filters\" : {\r\n        \"quiz\":\"681e17ba2700f4d75fbea0c1\"\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n  \"filters\": { \"quiz\": \"QUIZ_ID\" }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/questions",
@@ -205,24 +447,12 @@
 							]
 						}
 					},
-					"response": []
+					"response": [],
+					"description": "Get all questions. Optionally filter by quiz."
 				},
 				{
 					"name": "Solve Question",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [
 							{
@@ -232,12 +462,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"answer\": \"mixture\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n  \"answer\": \"your_answer_here\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/questions/:id/solve",
@@ -252,72 +477,31 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "681e17ba2700f4d75fbea0c3"
+									"value": "QUESTION_ID"
 								}
 							]
 						}
 					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"item": [
-				{
-					"name": "Get All Users",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/users",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users"
-							]
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Question solved successfully\",\n  \"data\": {\n    \"isCorrect\": true,\n    \"question\": \"...\",\n    \"answer\": \"...\"\n  }\n}"
 						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Sign Up",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"test@exa2mple.com\",\n  \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/signup",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"signup"
-							]
-						}
-					},
-					"response": []
+					],
+					"description": "Solve a single question. Requires authentication."
 				},
 				{
-					"name": "Login",
+					"name": "Solve All Questions in a Quiz",
 					"request": {
 						"method": "POST",
 						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
 							{
 								"key": "Content-Type",
 								"value": "application/json"
@@ -325,54 +509,39 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+							"raw": "{\n  \"answers\": [\n    { \"questionId\": \"QUESTION_ID_1\", \"answer\": \"answer1\" },\n    { \"questionId\": \"QUESTION_ID_2\", \"answer\": \"answer2\" }\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/login",
+							"raw": "{{base_url}}/questions/quiz/:quizId/solve",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"auth",
-								"login"
+								"questions",
+								"quiz",
+								":quizId",
+								"solve"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "QUIZ_ID"
+								}
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Quiz solved successfully\",\n  \"data\": {\n    \"totalQuestions\": 5,\n    \"correctAnswers\": 3,\n    \"percentage\": 60,\n    \"results\": [\n      {\n        \"questionId\": \"...\",\n        \"question\": \"...\",\n        \"isCorrect\": true,\n        \"userAnswer\": \"...\",\n        \"correctAnswer\": \"...\"\n      }\n    ]\n  }\n}"
+						}
+					],
+					"description": "Solve all questions in a quiz at once. Requires authentication. Returns detailed results and score."
 				}
 			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:5000"
-		},
-		{
-			"key": "token",
-			"value": ""
 		}
 	]
 }
