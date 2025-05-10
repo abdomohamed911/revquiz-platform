@@ -323,22 +323,90 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"filters\": { \"faculty\": \"FACULTY_ID\" }\n}"
-						},
 						"url": {
-							"raw": "{{base_url}}/courses",
+							"raw": "{{base_url}}/courses?faculty=FACULTY_ID",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"courses"
+							],
+							"query": [
+								{
+									"key": "faculty",
+									"value": "FACULTY_ID",
+									"description": "Filter by faculty ID (optional)"
+								}
 							]
 						}
 					},
 					"response": [],
-					"description": "Get all courses. Optionally filter by faculty."
+					"description": "Get all courses. Optionally filter by faculty using query params."
+				},
+				{
+					"name": "Get All Courses (Full Features)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/courses?faculty=FACULTY_ID&sort=-name,createdAt&fields=name,faculty,createdAt&keywords=engineering&page=2&limit=5&populate=faculty&price[gte]=100&price[lte]=500",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "faculty",
+									"value": "FACULTY_ID",
+									"description": "Filter by faculty ID"
+								},
+								{
+									"key": "sort",
+									"value": "-name,createdAt",
+									"description": "Sort by name desc, createdAt asc"
+								},
+								{
+									"key": "fields",
+									"value": "name,faculty,createdAt",
+									"description": "Select fields"
+								},
+								{
+									"key": "keywords",
+									"value": "engineering",
+									"description": "Search in title/description"
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "5",
+									"description": "Results per page"
+								},
+								{
+									"key": "populate",
+									"value": "faculty",
+									"description": "Populate faculty field"
+								},
+								{
+									"key": "price[gte]",
+									"value": "100",
+									"description": "Price >= 100"
+								},
+								{
+									"key": "price[lte]",
+									"value": "500",
+									"description": "Price <= 500"
+								}
+							]
+						}
+					},
+					"response": [],
+					"description": "Get all courses with all advanced query features."
 				},
 				{
 					"name": "Create Course",
@@ -378,22 +446,25 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"filters\": { \"course\": \"COURSE_ID\" }\n}"
-						},
 						"url": {
-							"raw": "{{base_url}}/quizzes",
+							"raw": "{{base_url}}/quizzes?course=COURSE_ID",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"quizzes"
+							],
+							"query": [
+								{
+									"key": "course",
+									"value": "COURSE_ID",
+									"description": "Filter by course ID (optional)"
+								}
 							]
 						}
 					},
 					"response": [],
-					"description": "Get all quizzes. Optionally filter by course."
+					"description": "Get all quizzes. Optionally filter by course using query params."
 				},
 				{
 					"name": "Create Quiz",
@@ -433,22 +504,25 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"filters\": { \"quiz\": \"QUIZ_ID\" }\n}"
-						},
 						"url": {
-							"raw": "{{base_url}}/questions",
+							"raw": "{{base_url}}/questions?quiz=QUIZ_ID",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"questions"
+							],
+							"query": [
+								{
+									"key": "quiz",
+									"value": "QUIZ_ID",
+									"description": "Filter by quiz ID (optional)"
+								}
 							]
 						}
 					},
 					"response": [],
-					"description": "Get all questions. Optionally filter by quiz."
+					"description": "Get all questions. Optionally filter by quiz using query params."
 				},
 				{
 					"name": "Solve Question",
