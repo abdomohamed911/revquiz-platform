@@ -161,24 +161,32 @@ export const questionController = {
           return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
         }
 
+        // Fetch quiz name
+        const QuizModel = require("../Quiz/model").QuizModel;
+        const quizDoc = await QuizModel.findById(quizId);
+        const quizName = quizDoc ? quizDoc.name : "Quiz";
         if (percentage >= 50) {
           await UserModel.findByIdAndUpdate(user._id, {
             $inc: { "score.quizzes.passed.count": 1 },
             $push: {
-              "score.quizzes.passed.quizzes": {
-                id: quizId,
-                name: "Quiz Name Here", // Replace with actual quiz name if available
-              },
+              "score.quizzes.passed.quizzes": [
+                {
+                  id: quizId,
+                  name: quizName,
+                },
+              ],
             },
           });
         } else {
           await UserModel.findByIdAndUpdate(user._id, {
             $inc: { "score.quizzes.failed.count": 1 },
             $push: {
-              "score.quizzes.failed.quizzes": {
-                id: quizId,
-                name: "Quiz Name Here", // Replace with actual quiz name if available
-              },
+              "score.quizzes.failed.quizzes": [
+                {
+                  id: quizId,
+                  name: quizName,
+                },
+              ],
             },
           });
         }
