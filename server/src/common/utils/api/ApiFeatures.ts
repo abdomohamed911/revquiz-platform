@@ -16,12 +16,12 @@ interface IPagination {
 }
 export class ApiFeatures {
   mongooseQuery;
-  reqBody: IRequestBody;
+  queryParams: IRequestBody;
   pagination: IPagination;
 
-  constructor(mongooseQuery: any, reqBody: IRequestBody) {
+  constructor(mongooseQuery: any, queryParams: IRequestBody) {
     this.mongooseQuery = mongooseQuery;
-    this.reqBody = reqBody;
+    this.queryParams = queryParams;
     this.pagination = {
       currentPage: 1,
       limit: 20,
@@ -43,7 +43,7 @@ export class ApiFeatures {
     ];
     // Use all non-reserved keys as filters
     const queryFilters: Record<string, any> = {};
-    for (const [key, value] of Object.entries(this.reqBody)) {
+    for (const [key, value] of Object.entries(this.queryParams)) {
       if (!reserved.includes(key) && value !== undefined && value !== "") {
         // Support for advanced filtering (e.g., price[gte]=10)
         if (key.includes("[")) {
@@ -64,8 +64,7 @@ export class ApiFeatures {
   }
 
   sort() {
-    // Support sort from both query/body and params
-    const sortValue = this.reqBody.sort || (this.reqBody as any).params?.sort;
+    const sortValue = this.queryParams.sort;
     if (sortValue) {
       const sortBy = sortValue.split(" ").join(" ");
       this.mongooseQuery = this.mongooseQuery.sort(sortBy);
@@ -76,9 +75,7 @@ export class ApiFeatures {
   }
 
   limitFields() {
-    // Support fields from both query/body and params
-    const fieldsValue =
-      this.reqBody.fields || (this.reqBody as any).params?.fields;
+    const fieldsValue = this.queryParams.fields;
     if (fieldsValue) {
       const fields = fieldsValue.split(",").join(" ");
       this.mongooseQuery = this.mongooseQuery.select(fields);
@@ -89,9 +86,7 @@ export class ApiFeatures {
   }
 
   search() {
-    // Support keywords from both query/body and params
-    const keywordsValue =
-      this.reqBody.keywords || (this.reqBody as any).params?.keywords;
+    const keywordsValue = this.queryParams.keywords;
     if (keywordsValue) {
       const keywords = keywordsValue;
       this.mongooseQuery = this.mongooseQuery.find({
@@ -105,10 +100,8 @@ export class ApiFeatures {
   }
 
   paginate(documentsCount?: number) {
-    // Support page/limit from both query/body and params
-    const pageValue = this.reqBody.page || (this.reqBody as any).params?.page;
-    const limitValue =
-      this.reqBody.limit || (this.reqBody as any).params?.limit;
+    const pageValue = this.queryParams.page;
+    const limitValue = this.queryParams.limit;
     const page = parseInt(pageValue || "1") * 1 || 1;
     const limit = parseInt(limitValue || "20") || 20;
     const skip = (page - 1) * limit;
@@ -123,9 +116,7 @@ export class ApiFeatures {
   }
 
   populate() {
-    // Support populate from both query/body and params
-    const populateValue =
-      this.reqBody.populate || (this.reqBody as any).params?.populate;
+    const populateValue = this.queryParams.populate;
     if (populateValue) {
       this.mongooseQuery = this.mongooseQuery.populate(populateValue);
     }

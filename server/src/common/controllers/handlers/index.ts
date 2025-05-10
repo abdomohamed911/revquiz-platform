@@ -120,7 +120,7 @@ export default function baseController(
     },
     getAll: {
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
-        // Convert req.query to { [key: string]: string }
+        // Only use req.query (params) for filtering, sorting, etc. Ignore body.
         const queryParams: { [key: string]: string } = {};
         Object.entries(req.query).forEach(([key, value]) => {
           if (typeof value === "string") queryParams[key] = value;
