@@ -12,7 +12,7 @@ function DifficultySelectionPage() {
   ];
 
   const handleSelect = (level) => {
-    navigate(`/faculties/${faculty}/courses/${course}/difficulty/${level}/quizzes/quiz1`);
+    navigate(`/faculties/${faculty}/courses/${course}/difficulty/${level}/quizzes`);
   };
 
   return (

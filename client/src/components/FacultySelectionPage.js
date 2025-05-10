@@ -32,7 +32,7 @@ function FacultySelectionPage() {
           <div
             key={fac._id}
             className="card"
-            onClick={() => navigate(`/faculties/${fac._id}/courses`)}
+            onClick={() => navigate(`${fac.name}/courses/`)}
           >
             <div style={{ fontSize: "2rem" }}>🏫</div>
             <h3>{fac.name}</h3>
