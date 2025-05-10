@@ -1,13 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../lib/axios";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Only save intended path if redirected
+    if (location.state?.redirectTo) {
+      sessionStorage.setItem("redirectTo", location.state.redirectTo);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +25,13 @@ function LoginPage() {
       const res = await api.post("/auth/login", { email, password });
       const token = res.data.data.token;
       localStorage.setItem("token", token);
-      navigate("/"); // Redirect to home or dashboard
+      // Check for redirect path in sessionStorage
+      const redirectTo =
+        sessionStorage.getItem("redirectTo") ||
+        location.state?.redirectTo ||
+        "/";
+      sessionStorage.removeItem("redirectTo");
+      navigate(redirectTo);
     } catch (err) {
       setError(
         err.response?.data?.message || "Login failed. Please try again."

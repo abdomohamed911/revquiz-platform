@@ -1,13 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../lib/axios";
 
 function SignupPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // If redirected to signup, save intended path
+    if (location.state?.redirectTo) {
+      sessionStorage.setItem("redirectTo", location.state.redirectTo);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,15 +25,22 @@ function SignupPage() {
       const res = await api.post("/auth/signup", { email, password });
       const token = res.data.data.token;
       localStorage.setItem("token", token);
-      navigate("/"); // Redirect to home or dashboard
+      // Check for redirect path in sessionStorage
+      const redirectTo =
+        sessionStorage.getItem("redirectTo") ||
+        location.state?.redirectTo ||
+        "/";
+      sessionStorage.removeItem("redirectTo");
+      navigate(redirectTo);
     } catch (err) {
-        if (err.response?.status === 400) {
-          setError("Invalid email or password.");
-          return;
-        }
-      setError(
-        err.response?.data?.message || "Signup failed. Please try again."
-      );
+      if (err.response?.status === 422) {
+        setError("Invalid email or password.");
+        return;
+      } else {
+        setError(
+          err.response?.data?.message || "Signup failed. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }

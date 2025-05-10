@@ -50,9 +50,20 @@ function QuizzesPage() {
   if (error) return <div>{error}</div>;
 
   const handleQuizSelect = (quiz) => {
-    navigate(
-      `/faculties/${facultyName}/courses/${courseName}/difficulty/${level}/quizzes/${quiz._id}`
-    );
+    // Save intended path if not logged in
+    const token = localStorage.getItem("token");
+    const quizPath = `/faculties/${facultyName}/courses/${courseName}/difficulty/${level}/quizzes/${quiz.name}`;
+    if (!token) {
+      sessionStorage.setItem("redirectTo", quizPath);
+      navigate("/login", {
+        state: {
+          redirectTo: quizPath,
+          message: "Please login to access the quiz.",
+        },
+      });
+    } else {
+      navigate(quizPath);
+    }
   };
 
   return (

@@ -6,16 +6,16 @@ const questionRouter = Router();
 
 questionRouter
   .route("/")
-  .get(c.getAll.validator, c.getAll.handler)
-  .post(c.create.validator, c.create.handler);
+  .get(authMiddleware, c.getAll.validator, c.getAll.handler)
+//   .post(authMiddleware,c.create.validator, c.create.handler);
 
-questionRouter
-  .route("/:id")
-  .get(c.getOne.validator, c.getOne.handler)
-  .put(c.update.validator, c.update.handler)
-  .delete(c.deleteOne.validator, c.deleteOne.handler);
+// questionRouter
+//   .route("/:id")
+//   .get(authMiddleware, c.getOne.validator, c.getOne.handler)
+//   .put(authMiddleware, c.update.validator, c.update.handler)
+//   .delete(authMiddleware,c.deleteOne.validator, c.deleteOne.handler);
 
-questionRouter.get(
+questionRouter.post(
   "/:id/solve",
   authMiddleware, // Protect this route
   c.solveQuestion.validator,
