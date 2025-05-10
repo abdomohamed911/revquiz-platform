@@ -1,4 +1,4 @@
-import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
@@ -9,7 +9,8 @@ import QuizPage from "./components/QuizPage";
 import ResultPage from "./components/ResultPage";
 import "./styles/styles.css";
 import QuizzesPage from "./components/QuizzesPage";
-
+import LoginPage from "./components/LoginPage";
+import SignupPage from "./components/SignupPage";
 function App() {
   return (
     <Router>
@@ -38,6 +39,8 @@ function App() {
             path="/faculties/:facultyName/courses/:courseName/difficulty/:level/quizzes"
             element={<QuizzesPage />}
           />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
         </Routes>
       </div>
     </Router>
