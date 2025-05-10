@@ -10,13 +10,19 @@ import courseRouter from "./modules/Course/routes";
 import quizRouter from "./modules/Quiz/routes";
 import questionRouter from "./modules/Question/routes";
 import userRouter, { authRouter } from "./modules/User/routes";
-
+import cors from "cors";
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 dbConnection.connect();
 
 app.use("/faculties", facultyRouter);
