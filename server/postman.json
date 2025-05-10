@@ -188,6 +188,129 @@
 					},
 					"response": [],
 					"description": "Create a new faculty."
+				},
+				{
+					"name": "Get Faculty By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty found\",\n  \"data\": { \"_id\": \"...\", \"name\": \"...\" }\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Get a faculty by its ID."
+				},
+				{
+					"name": "Update Faculty",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Faculty Name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty updated\",\n  \"data\": { \"_id\": \"...\", \"name\": \"Updated Faculty Name\" }\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Update a faculty by its ID."
+				},
+				{
+					"name": "Delete Faculty",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/faculties/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"faculties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "FACULTY_ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"status\": \"OK\",\n  \"message\": \"Faculty deleted\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"body": "{\n  \"status\": \"fail\",\n  \"message\": \"Faculty not found\"\n}"
+						}
+					],
+					"description": "Delete a faculty by its ID."
 				}
 			]
 		},
