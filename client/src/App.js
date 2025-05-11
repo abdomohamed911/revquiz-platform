@@ -11,6 +11,7 @@ import QuizzesPage from "./components/QuizzesPage";
 import LoginPage from "./components/LoginPage";
 import SignupPage from "./components/SignupPage";
 import ProfilePage from "./components/ProfilePage";
+import AdminPage from "./components/admin/AdminPage";
 function App() {
   return (
     <Router>
@@ -42,6 +43,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </div>
     </Router>
