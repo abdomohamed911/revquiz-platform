@@ -112,20 +112,6 @@ export const questionService = {
         },
       });
     }
-    await UserModel.findByIdAndUpdate(user._id, {
-      $inc: {
-        "score.questions.passed.count": correctCount,
-        "score.questions.failed.count": totalQuestions - correctCount,
-      },
-      $push: {
-        "score.questions.passed.questions": questions
-          .filter((q, i) => results[i].isCorrect)
-          .map((q) => ({ id: q._id, text: q.question })),
-        "score.questions.failed.questions": questions
-          .filter((q, i) => !results[i].isCorrect)
-          .map((q) => ({ id: q._id, text: q.question })),
-      },
-    });
     return new ApiSuccess("OK", "Quiz solved successfully", {
       totalQuestions,
       correctAnswers: correctCount,

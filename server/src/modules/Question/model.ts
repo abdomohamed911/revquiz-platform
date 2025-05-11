@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
       isCorrect: {
         type: Boolean,
         default: false,
+        select: false,
       },
     },
   ],
