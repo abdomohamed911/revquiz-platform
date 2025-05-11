@@ -1,11 +1,8 @@
 import baseController from "@/common/controllers/handlers";
 import QuestionModel from "./model";
 import expressAsyncHandler from "express-async-handler";
-import ApiError from "@/common/utils/api/ApiError";
 import { body, param } from "express-validator";
 import validatorMiddleware from "@/common/middleware/validators/validator";
-import ApiSuccess from "@/common/utils/api/ApiSuccess";
-import UserModel from "../User/model";
 import { questionService } from "./service";
 
 // Extend the Request interface to include the user property

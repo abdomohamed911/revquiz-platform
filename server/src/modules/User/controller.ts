@@ -19,11 +19,12 @@ export const userController = {
           return next(new ApiError("User not found", "NOT_FOUND"));
         }
 
-        res
-          .status(200)
-          .json(
-            new ApiSuccess("OK", "User profile fetched successfully", userData)
-          );
+        ApiSuccess.send(
+          res,
+          "OK",
+          "User profile fetched successfully",
+          userData
+        );
       } catch (error) {
         next(error);
       }
