@@ -1,45 +1,160 @@
-# ReviQuiz | AIU
+# RevQuiz -- Intelligent Quiz Platform
 
-ReviQuiz | AIU is a quiz application designed for Alamein International University (AIU). This web application was developed as a college project for a web programming course. It allows users to take quizzes based on various faculties and difficulty levels, providing an engaging and educational experience.
+A full-stack quiz platform designed to help students test and reinforce their knowledge through faculty-specific, course-aligned quizzes with configurable difficulty levels, timed sessions, and detailed score tracking.
 
-This project is divided into two main parts:
+## Overview
 
-- **Client (Frontend)**: Developed with React, this is what the user interacts with. More details can be found in the [client/README.md](./client/README.md).
-- **Server (Backend)**: Developed with Node.js, Express.js, and TypeScript, this handles the logic and data. More details can be found in the [server/readme.md](./server/readme.md).
+RevQuiz addresses the gap between lecture material and exam readiness by providing a structured, repeatable testing environment. Students select their faculty and course, choose a difficulty mode, and immediately begin a timed quiz session. Upon completion, they receive a detailed breakdown of their performance, enabling targeted revision of weak areas.
 
-## Overall Architecture
+The platform separates concerns cleanly between a React-based frontend and an Express + TypeScript backend with MongoDB persistence, making it straightforward to scale, extend, and maintain.
 
-The application follows a standard client-server architecture:
+## Features
 
-- The **React client** is responsible for the user interface and user experience. It makes API calls to the backend to fetch data and submit user actions.
-- The **Express.js server** provides a RESTful API for the client to consume. It handles business logic, interacts with the MongoDB database, and manages user authentication.
+- **JWT Authentication** -- Secure login and registration system with token-based session management
+- **Faculty and Course Selection** -- Hierarchical organization that maps quizzes to specific academic departments and courses
+- **Difficulty Modes** -- Three distinct difficulty tiers (easy, medium, hard) that adjust question complexity and scoring
+- **Timed Quiz Sessions** -- Countdown timer that enforces real-world exam conditions and auto-submits on expiry
+- **Score Tracking** -- Persistent score history tied to each user account for longitudinal progress monitoring
+- **Detailed Results** -- Post-quiz breakdown showing correct answers, incorrect selections, and per-question performance
+- **Responsive Interface** -- Fully responsive frontend that works across desktop, tablet, and mobile devices
+- **Postman Collection** -- Complete API testing suite included for rapid development and QA workflows
 
-## Key Learnings from the Project
+## Tech Stack
 
-This project provided valuable experience in full-stack web development. Some of the key takeaways include:
+| Layer | Technology |
+|---|---|
+| Frontend | React, JavaScript |
+| Backend | Express, TypeScript |
+| Database | MongoDB |
+| Authentication | JWT (JSON Web Tokens) |
+| API Testing | Postman |
 
-- **Full-Stack Integration**: Understanding how a frontend application communicates with a backend API, including data fetching, submission, and error handling.
-- **React Fundamentals**: Building a responsive and interactive user interface using React components, state management, and routing.
-- **Backend API Development**: Designing and implementing RESTful APIs with Node.js, Express.js, and TypeScript, including data validation, authentication (JWT), and database interactions (MongoDB with Mongoose).
-- **Version Control**: Using Git and GitHub for managing code, collaborating, and tracking changes.
-- **Project Management**: Planning features, breaking down tasks, and managing time effectively to deliver a functional application.
-- **Deployment Concepts**: Gaining an initial understanding of what it takes to get a web application live (though this project might primarily run locally).
+## Architecture
 
-## Future Improvements
+The platform follows a standard three-tier architecture:
 
-This project has a solid foundation, and here are some ideas for future enhancements:
+```
+revquiz-platform/
+  client/                 # React frontend
+    src/
+      components/         # UI components
+      pages/              # Route-level views
+      services/           # API client layer
+      context/            # Auth and app state
+  server/                 # Express + TypeScript backend
+    src/
+      controllers/        # Request handlers
+      models/             # Mongoose schemas
+      routes/             # Express route definitions
+      middleware/         # Auth, validation, error handling
+      config/             # Environment and database config
+  postman/                # Postman collection for API testing
+```
 
-- **Enhanced User Profiles**: Allow users to see their quiz history, track progress over time, and perhaps customize their profiles.
-- **Admin Dashboard Improvements**: More granular control for admins, such as managing users, viewing detailed analytics, and easier content management for questions and quizzes.
-- **More Question Types**: Introduce different types of questions beyond multiple choice (e.g., true/false, fill-in-the-blanks, matching).
-- **Timed Quizzes**: Add an option for timed quizzes to increase the challenge.
-- **Leaderboards**: Implement leaderboards to foster competition and engagement.
-- **Password Recovery**: Add a "forgot password" feature.
-- **Deployment**: Deploy the application to a cloud platform (e.g., Heroku, Vercel, AWS) to make it publicly accessible.
-- **Comprehensive Testing**: Add more unit and integration tests for both frontend and backend to ensure robustness.
-- **Accessibility (a11y)**: Improve accessibility to ensure the application can be used by people with disabilities.
-- **UI/UX Refinements**: Conduct user testing and iterate on the design for a more intuitive and polished user experience.
+**Data Flow:**
+
+1. The React client authenticates through the login endpoint and stores the JWT
+2. Authenticated requests include the token in the Authorization header
+3. The backend validates the token via middleware before processing any protected route
+4. Quiz data is fetched by faculty and course, filtered by the selected difficulty
+5. On submission, answers are evaluated server-side and scores are persisted to MongoDB
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Create a new user account |
+| POST | `/api/auth/login` | Authenticate and receive a JWT |
+
+### Faculties & Courses
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/faculties` | List all available faculties |
+| GET | `/api/faculties/:id/courses` | List courses for a specific faculty |
+
+### Quizzes
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/quizzes?course=:courseId&difficulty=:level` | Fetch quiz questions by course and difficulty |
+| POST | `/api/quizzes/:id/submit` | Submit quiz answers for evaluation |
+
+### Scores
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/scores` | Get score history for the authenticated user |
+| GET | `/api/scores/:quizId` | Get detailed results for a specific quiz attempt |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or later
+- MongoDB (local instance or MongoDB Atlas connection string)
+- npm or yarn
+
+### Environment Variables
+
+Create a `.env` file in the `server/` directory:
+
+```
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/revquiz
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRE=7d
+```
+
+### Installation
+
+```bash
+git clone https://github.com/abdomohamed911/revquiz-platform.git
+cd revquiz-platform
+```
+
+Install backend dependencies:
+
+```bash
+cd server
+npm install
+```
+
+Install frontend dependencies:
+
+```bash
+cd ../client
+npm install
+```
+
+### Run Locally
+
+Start the backend server:
+
+```bash
+cd server
+npm run dev
+```
+
+Start the frontend development server:
+
+```bash
+cd client
+npm start
+```
+
+The backend runs on `http://localhost:5000` and the frontend on `http://localhost:3000`.
+
+### API Testing
+
+Import the included Postman collection from the `postman/` directory to test all endpoints. Set the `base_url` variable to `http://localhost:5000` and configure the authentication token after running the login request.
+
+## License
+
+MIT
 
 ---
 
-Thank you for checking out ReviQuiz | AIU! We hope this project demonstrates the skills and effort invested during the web programming course.
+**Abdelrahman Mohamed** | [GitHub](https://github.com/abdomohamed911)
