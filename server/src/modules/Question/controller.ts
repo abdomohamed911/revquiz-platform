@@ -24,7 +24,7 @@ export const questionController = {
         const { answer } = req.body;
         const user = req.user;
         const result = await questionService.solveQuestion({
-          id,
+          id: id as string,
           answer,
           user,
         });
@@ -55,7 +55,7 @@ export const questionController = {
         const { answers } = req.body;
         const user = req.user;
         const result = await questionService.solveAllQuestions({
-          quizId,
+          quizId: quizId as string,
           answers,
           user,
         });

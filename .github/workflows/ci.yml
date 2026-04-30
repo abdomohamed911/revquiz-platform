@@ -43,7 +43,7 @@ jobs:
 
       - name: Type check server
         working-directory: server
-        run: npx tsc --noEmit
+        run: npx tsc --noEmit -p tsconfig.json
         env:
           DB_URL: mongodb://localhost:27017
           DB_NAME: revquiz-test

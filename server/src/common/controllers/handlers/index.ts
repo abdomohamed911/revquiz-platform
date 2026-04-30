@@ -61,7 +61,7 @@ export default function baseController(
     deleteOne: {
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
         const { id } = req.params;
-        const result = await s.deleteOne(id);
+        const result = await s.deleteOne(id as string);
         ApiSuccess.send(res, 'OK', 'document deleted', result);
       }),
       validator: [
@@ -74,7 +74,7 @@ export default function baseController(
         const { id } = req.params;
         const updatedData = req.body;
         const result = await s.update(
-          id,
+          id as string,
           updatedData,
           normalizedExcludedData.update
         );
@@ -110,7 +110,7 @@ export default function baseController(
     getOne: {
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
         const { id } = req.params;
-        const result = await s.getOne(id);
+        const result = await s.getOne(id as string);
         ApiSuccess.send(res, 'OK', 'document found', result);
       }),
       validator: [
