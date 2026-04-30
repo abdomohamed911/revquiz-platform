@@ -81,7 +81,7 @@ const seedController = expressAsyncHandler(async (req, res) => {
       ],
       'Boolean Algebra Fundamentals': [
         { q: 'What is the result of A AND 0?', correct: '0', wrong: ['A', '1', 'Not A'] },
-        { q: "De Morgan's theorem states that NOT(A AND B) equals:", correct: '(NOT A) OR (NOT B)', wrong: ['(NOT A) AND (NOT B)', 'A AND B', 'NOT(A OR B)'] },
+        { q: 'De Morgan\'s theorem states that NOT(A AND B) equals:', correct: '(NOT A) OR (NOT B)', wrong: ['(NOT A) AND (NOT B)', 'A AND B', 'NOT(A OR B)'] },
         { q: 'How many rows does a truth table for 3 variables have?', correct: '8', wrong: ['4', '6', '9'] },
         { q: 'What is A XOR A?', correct: '0', wrong: ['A', '1', 'NOT A'] },
         { q: 'Which gate is known as the universal gate?', correct: 'NAND', wrong: ['AND', 'OR', 'XOR'] },

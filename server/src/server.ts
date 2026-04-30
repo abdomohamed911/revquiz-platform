@@ -17,11 +17,26 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Health check endpoint
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.status(200).json({ ok: true, timestamp: new Date().toISOString() });
+});
+
 app.use(apiLimiter);
 app.use(express.json());
 
-// CORS configuration — allow all origins (public API)
-app.use(cors({ origin: true, credentials: true }));
+// CORS configuration — lock down in production, allow all in development
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+  : undefined;
+
+app.use(
+  cors({
+    origin: corsOrigins ?? true,
+    credentials: true,
+  })
+);
+
 dbConnection.connect();
 
 app.use('/faculties', facultyRouter);

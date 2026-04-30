@@ -61,6 +61,8 @@ describe("adminMiddleware", () => {
 });
 
 describe("authMiddleware", () => {
+  beforeAll(() => { process.env.JWT_SECRET = 'test-secret'; });
+  afterAll(() => { delete process.env.JWT_SECRET; });
   const mockUser = {
     _id: "user123",
     email: "test@test.com",
