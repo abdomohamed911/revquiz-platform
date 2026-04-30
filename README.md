@@ -1,6 +1,17 @@
-# RevQuiz -- Full-Stack Quiz Platform
+# RevQuiz — Full-Stack Quiz Platform
+
+[![CI](https://github.com/abdomohamed911/revquiz-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/abdomohamed911/revquiz-platform/actions/workflows/ci.yml)
 
 A full-stack quiz platform for Alamein International University. Students select their faculty, course, and difficulty level, then take quizzes with real-time scoring and persistent score tracking.
+
+## Live Demo
+
+| Resource | URL |
+|---|---|
+| **Frontend** | [https://revquiz.vercel.app](https://revquiz.vercel.app) |
+| **API** | [https://revquiz-server.up.railway.app](https://revquiz-server.up.railway.app) |
+| **Demo Login** | `demo@test.com` / `Demo123!` |
+| **Admin Login** | `admin@test.com` / `Admin123!` |
 
 ## What It Does
 
@@ -16,29 +27,30 @@ This started as a university web programming course project at Alamein Internati
 |---|---|
 | Frontend | React 19, JavaScript, Tailwind CSS |
 | Backend | Express 4, TypeScript (strict mode), Node.js 20 |
-| Database | MongoDB with Mongoose ODM |
+| Database | MongoDB (Atlas) with Mongoose ODM |
 | Auth | JWT with bcryptjs password hashing |
 | Rate Limiting | express-rate-limit (10 req/15min on auth) |
 | Testing | Jest, Supertest, ts-jest |
-| CI/CD | GitHub Actions (lint + typecheck + test) |
+| CI/CD | GitHub Actions (lint + typecheck + build + test) |
+| Deployment | Railway (backend) + Vercel (frontend) |
 | Containerization | Docker + docker-compose (MongoDB + server + nginx) |
 
 ## Architecture
 
 ```mermaid
 graph TD
-    Client[React Client] -->|HTTP/REST| Server[Express Server]
+    Client[React Client - Vercel] -->|HTTP/REST| Server[Express Server - Railway]
     Server --> AuthMW[Auth Middleware]
-    AuthMW -->|JWT verify| UserDB[(MongoDB: users)]
+    AuthMW -->|JWT verify| UserDB[(MongoDB Atlas: users)]
     Server --> FacultyAPI[Faculty API]
     Server --> CourseAPI[Course API]
     Server --> QuizAPI[Quiz API]
     Server --> QuestionAPI[Question API]
-    FacultyAPI --> CourseDB[(MongoDB: faculties)]
+    FacultyAPI --> CourseDB[(MongoDB Atlas: faculties)]
     CourseAPI --> CourseDB
-    CourseAPI --> QuizDB[(MongoDB: quizzes)]
+    CourseAPI --> QuizDB[(MongoDB Atlas: quizzes)]
     QuizAPI --> QuizDB
-    QuestionAPI --> QuestionDB[(MongoDB: questions)]
+    QuestionAPI --> QuestionDB[(MongoDB Atlas: questions)]
     QuestionAPI --> UserDB
 ```
 
@@ -72,7 +84,6 @@ All CRUD resources follow the same pattern: GET (list/get by ID) is public, POST
 
 - Node.js 20+
 - MongoDB 7+ (local or Atlas)
-- pnpm (for server), npm (for client)
 
 ### Setup
 
@@ -81,19 +92,21 @@ git clone https://github.com/abdomohamed911/revquiz-platform.git
 cd revquiz-platform
 
 # 1. Create environment file
-cp .env.example .env
+cp server/.env.example server/.env
 # Edit .env with your MongoDB connection string and JWT secret
 
 # 2. Install and start backend
 cd server
-pnpm install
-pnpm dev
+npm install
+npm run dev
 
 # 3. Seed database (in a new terminal)
-pnpm seed
+npm run seed
 
 # 4. Install and start frontend (in a new terminal)
 cd ../client
+cp .env.example .env.local
+# Set REACT_APP_API_URL=http://localhost:5000 in .env.local
 npm install
 npm start
 ```
@@ -107,7 +120,7 @@ The server runs on `http://localhost:5000` and the client on `http://localhost:3
 docker compose up --build
 
 # Seed the database
-docker compose exec server pnpm ts-node -r tsconfig-paths/register scripts/seeder.ts
+npm run docker:seed
 ```
 
 Access the app at `http://localhost:3000`.
@@ -118,14 +131,45 @@ After running the seeder, use these accounts:
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@test.com (first seeded user) | password123 |
-| User | user1@test.com | password123 |
+| Admin | admin@test.com | Admin123! |
+| Demo User | demo@test.com | Demo123! |
+
+## Deployment
+
+### Backend (Railway)
+
+1. Connect `abdomohamed911/revquiz-platform` to [Railway](https://railway.app)
+2. Root directory: `/server`
+3. Build command: `npm ci && npm run build`
+4. Start command: `npm start`
+5. Environment variables:
+   - `MONGODB_URI` — Your MongoDB Atlas connection string
+   - `JWT_SECRET` — A random 32+ character string
+   - `CORS_ORIGIN` — Your Vercel frontend URL (e.g., `https://revquiz.vercel.app`)
+   - `NODE_ENV=production`
+
+### Frontend (Vercel)
+
+1. Connect `abdomohamed911/revquiz-platform` to [Vercel](https://vercel.com)
+2. Root directory: `/client`
+3. Framework preset: Create React App (detected automatically)
+4. Environment variables:
+   - `REACT_APP_API_URL` — Your Railway backend URL (e.g., `https://revquiz-server.up.railway.app`)
+
+### Seeding Production
+
+```bash
+# After both deployments are live, seed the production database:
+cd server
+npx ts-node -r tsconfig-paths/register scripts/seeder.ts
+# Ensure MONGODB_URI points to your Atlas cluster
+```
 
 ## Results
 
 | Metric | Value |
 |---|---|
-| Backend test coverage | Target 70%+ (Jest + Supertest) |
+| Backend test coverage | 76 unit tests (9 suites) |
 | API response time | Sub-100ms on local |
 | Data models | 5 (User, Faculty, Course, Quiz, Question) |
 | API endpoints | 18 authenticated + public |

@@ -7,7 +7,7 @@ on:
     branches: [main, master]
 
 jobs:
-  lint-and-test:
+  lint-test-build:
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -33,6 +33,10 @@ jobs:
         working-directory: server
         run: npm ci
 
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
       - name: Lint server
         working-directory: server
         run: npm run lint
@@ -48,6 +52,20 @@ jobs:
           DB_URL: mongodb://localhost:27017
           DB_NAME: revquiz-test
           JWT_SECRET: test-secret-for-ci-only
+
+      - name: Build server
+        working-directory: server
+        run: npm run build
+        env:
+          DB_URL: mongodb://localhost:27017
+          DB_NAME: revquiz-test
+          JWT_SECRET: test-secret-for-ci-only
+
+      - name: Build client
+        working-directory: client
+        run: npm run build
+        env:
+          REACT_APP_API_URL: http://localhost:5000
 
       - name: Run server tests
         working-directory: server
