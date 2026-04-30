@@ -50,7 +50,7 @@ beforeAll(async () => {
   testApp = createTestApp();
 
   // Create admin user directly in DB
-  const { User } = await import("@/modules/User/model");
+  const { UserModel: User } = await import("@/modules/User/model");
   const adminPass = await bcrypt.hash(TEST_ADMIN.password, 10);
   const admin = await User.create({
     email: TEST_ADMIN.email,
@@ -76,7 +76,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  const { User } = await import("@/modules/User/model");
+  const { UserModel: User } = await import("@/modules/User/model");
   const { FacultyModel } = await import("@/modules/Faculty/model");
   const { CourseModel } = await import("@/modules/Course/model");
   const { QuizModel } = await import("@/modules/Quiz/model");
