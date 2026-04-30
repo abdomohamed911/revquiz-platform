@@ -73,18 +73,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
-  const { UserModel: User } = await import("@/modules/User/model");
-  const { FacultyModel } = await import("@/modules/Faculty/model");
-  const { CourseModel } = await import("@/modules/Course/model");
-  const { QuizModel } = await import("@/modules/Quiz/model");
-  const { default: QuestionModel } = await import("@/modules/Question/model");
-  await User.deleteMany({ email: { $regex: /test\.com$/ } });
-  await FacultyModel.deleteMany({});
-  await CourseModel.deleteMany({});
-  await QuizModel.deleteMany({});
-  await QuestionModel.deleteMany({});
-});
+// setup.ts afterAll handles DB cleanup (dropDatabase + close)
 
 describe("Auth API", () => {
   test("POST /auth/signup - creates a new user", async () => {
