@@ -8,8 +8,8 @@ A full-stack quiz platform for Alamein International University. Students select
 
 | Resource | URL |
 |---|---|
-| **Frontend** | [https://revquiz.vercel.app](https://revquiz.vercel.app) |
-| **API** | [https://revquiz-server.up.railway.app](https://revquiz-server.up.railway.app) |
+| **Frontend** | [https://revquiz-azure.vercel.app](https://revquiz-azure.vercel.app) |
+| **API** | [https://revquiz-server-production.up.railway.app](https://revquiz-server-production.up.railway.app) |
 | **Demo Login** | `demo@test.com` / `Demo123!` |
 | **Admin Login** | `admin@test.com` / `Admin123!` |
 
@@ -27,7 +27,7 @@ This started as a university web programming course project at Alamein Internati
 |---|---|
 | Frontend | React 19, JavaScript, Tailwind CSS |
 | Backend | Express 4, TypeScript (strict mode), Node.js 20 |
-| Database | MongoDB (Atlas) with Mongoose ODM |
+| Database | MongoDB (Railway) with Mongoose ODM |
 | Auth | JWT with bcryptjs password hashing |
 | Rate Limiting | express-rate-limit (10 req/15min on auth) |
 | Testing | Jest, Supertest, ts-jest |
@@ -41,16 +41,16 @@ This started as a university web programming course project at Alamein Internati
 graph TD
     Client[React Client - Vercel] -->|HTTP/REST| Server[Express Server - Railway]
     Server --> AuthMW[Auth Middleware]
-    AuthMW -->|JWT verify| UserDB[(MongoDB Atlas: users)]
+    AuthMW -->|JWT verify| UserDB[(MongoDB: users)]
     Server --> FacultyAPI[Faculty API]
     Server --> CourseAPI[Course API]
     Server --> QuizAPI[Quiz API]
     Server --> QuestionAPI[Question API]
-    FacultyAPI --> CourseDB[(MongoDB Atlas: faculties)]
+    FacultyAPI --> CourseDB[(MongoDB: faculties)]
     CourseAPI --> CourseDB
-    CourseAPI --> QuizDB[(MongoDB Atlas: quizzes)]
+    CourseAPI --> QuizDB[(MongoDB: quizzes)]
     QuizAPI --> QuizDB
-    QuestionAPI --> QuestionDB[(MongoDB Atlas: questions)]
+    QuestionAPI --> QuestionDB[(MongoDB: questions)]
     QuestionAPI --> UserDB
 ```
 
@@ -158,12 +158,15 @@ After running the seeder, use these accounts:
 
 ### Seeding Production
 
+After both deployments are live, seed the production database by sending a POST request to the `/seed` endpoint with the `X-Seed-Key` header:
+
 ```bash
-# After both deployments are live, seed the production database:
-cd server
-npx ts-node -r tsconfig-paths/register scripts/seeder.ts
-# Ensure MONGODB_URI points to your Atlas cluster
+curl -X POST https://revquiz-server-production.up.railway.app/seed \
+  -H "Content-Type: application/json" \
+  -H "X-Seed-Key: your-seed-key"
 ```
+
+This creates the admin user, demo user, faculties, courses, quizzes, and questions.
 
 ## Results
 
