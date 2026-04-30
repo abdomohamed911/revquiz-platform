@@ -4,13 +4,14 @@ WORKDIR /app
 
 # Install dependencies
 FROM base AS deps
-COPY server/package.json server/package-lock.json* ./
-RUN npm ci --omit=dev
+COPY package.json package-lock.json* ./
+RUN npm ci
 
 # Build
 FROM base AS builder
-COPY server/ ./
+COPY package.json package-lock.json* ./
 COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 RUN npm run build
 
 # Production
@@ -19,10 +20,10 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
-COPY server/ ./
+COPY package.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=deps /app/node_modules ./node_modules
 
 USER nodejs
 EXPOSE 5000
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/src/server.js"]
