@@ -86,7 +86,7 @@ describe("authMiddleware", () => {
 
     expect(mockedJwt.verify).toHaveBeenCalledWith(
       "valid-token",
-      undefined
+      expect.any(String)
     );
     expect(req.user).toEqual(mockUser);
     expect(next).toHaveBeenCalledWith();

@@ -2,7 +2,6 @@ import request from "supertest";
 import express from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -50,27 +49,26 @@ beforeAll(async () => {
   testApp = createTestApp();
 
   // Create admin user directly in DB
+  // Pass PLAINTEXT password — the User model pre-save hook handles hashing
   const { UserModel: User } = await import("@/modules/User/model");
-  const adminPass = await bcrypt.hash(TEST_ADMIN.password, 10);
   const admin = await User.create({
     email: TEST_ADMIN.email,
-    password: adminPass,
+    password: TEST_ADMIN.password,
     role: "admin",
   });
 
-  // Create regular user
-  const userPass = await bcrypt.hash(TEST_USER.password, 10);
-  await User.create({
+  // Create regular user with real DB document so authMiddleware can find it
+  const user = await User.create({
     email: TEST_USER.email,
-    password: userPass,
+    password: TEST_USER.password,
     role: "user",
   });
 
-  // Generate tokens
+  // Generate tokens using real user IDs so authMiddleware can look them up
   adminToken = jwt.sign({ id: admin._id, email: admin.email }, JWT_SECRET, {
     expiresIn: "1h",
   });
-  userToken = jwt.sign({ id: admin._id + "user", email: TEST_USER.email }, JWT_SECRET, {
+  userToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
     expiresIn: "1h",
   });
 });
@@ -95,22 +93,26 @@ describe("Auth API", () => {
       password: "SignupPass123!",
     });
     expect(res.status).toBe(201);
-    expect(res.body.status).toBe("CREATED");
+    // ApiSuccess serializes as { response: { status, ... }, data: { userId, token } }
+    expect(res.body.response.status).toBe("success");
     expect(res.body.data.token).toBeDefined();
+    expect(res.body.data.userId).toBeDefined();
   });
 
   test("POST /auth/signup - rejects duplicate email", async () => {
+    // Use the SAME email for both requests to actually test duplicate rejection
+    const dupEmail = `dup-${Date.now()}@test.com`;
     await request(testApp).post("/auth/signup").send({
-      email: `dup-${Date.now()}@test.com`,
+      email: dupEmail,
       password: "Pass123!",
     });
     const res = await request(testApp).post("/auth/signup").send({
-      email: `dup-${Date.now()}@test.com`,
+      email: dupEmail,
       password: "Pass123!",
     });
-    // Second signup might succeed with unique email or the first one might have created it
-    // This test verifies the endpoint is reachable
-    expect([201, 409]).toContain(res.status);
+    // ApiError (via globalError) returns flat: { statusCode, statusMessage, status, message, errors }
+    expect(res.status).toBe(409);
+    expect(res.body.status).toBe("fail");
   });
 
   test("POST /auth/signup - rejects missing email", async () => {
@@ -126,6 +128,7 @@ describe("Auth API", () => {
       password: TEST_ADMIN.password,
     });
     expect(res.status).toBe(200);
+    expect(res.body.response.status).toBe("success");
     expect(res.body.data.token).toBeDefined();
     expect(res.body.data.userId).toBeDefined();
   });
@@ -151,7 +154,8 @@ describe("Faculty API", () => {
   test("GET /faculties - returns list", async () => {
     const res = await request(testApp).get("/faculties");
     expect(res.status).toBe(200);
-    expect(res.body.status).toBe("OK");
+    expect(res.body.response.status).toBe("success");
+    // baseServices.getAll returns { data: [...], pagination: {...} } nested inside ApiSuccess.data
     expect(Array.isArray(res.body.data.data)).toBe(true);
   });
 
@@ -161,6 +165,7 @@ describe("Faculty API", () => {
       .set("Authorization", `Bearer ${adminToken}`)
       .send({ name: `Faculty-${Date.now()}` });
     expect(res.status).toBe(201);
+    expect(res.body.response.status).toBe("success");
     expect(res.body.data._id).toBeDefined();
     expect(res.body.data.name).toBeDefined();
     facultyId = res.body.data._id;
@@ -171,13 +176,15 @@ describe("Faculty API", () => {
       .post("/faculties")
       .set("Authorization", `Bearer ${userToken}`)
       .send({ name: "Unauthorized Faculty" });
+    // userToken now has a real user ID → authMiddleware succeeds → adminMiddleware rejects
     expect(res.status).toBe(403);
   });
 
   test("GET /faculties/:id - returns faculty by ID", async () => {
     const res = await request(testApp).get(`/faculties/${facultyId}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.data._id).toBe(facultyId);
+    // baseController.getOne returns the document directly in data
+    expect(res.body.data._id).toBe(facultyId);
   });
 });
 
@@ -297,13 +304,16 @@ describe("Question API", () => {
         ],
       });
 
+    // The created question's ID is at res.body.data._id (baseController.create returns doc in data)
+    const secondQuestionId = qRes.body.data._id;
+
     const res = await request(testApp)
       .post(`/questions/quiz/${quizId}/solve`)
       .set("Authorization", `Bearer ${adminToken}`)
       .send({
         answers: [
           { questionId, answer: "4" },
-          { questionId: qRes.body.data.data._id, answer: "2" },
+          { questionId: secondQuestionId, answer: "2" },
         ],
       });
     expect(res.status).toBe(200);
