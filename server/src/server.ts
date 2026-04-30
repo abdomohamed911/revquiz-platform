@@ -20,27 +20,8 @@ const PORT = process.env.PORT || 5000;
 app.use(apiLimiter);
 app.use(express.json());
 
-// CORS configuration — allow specific origins in production
-const corsOrigin = process.env.CORS_ORIGIN;
-if (corsOrigin) {
-  const allowedOrigins = corsOrigin.split(',').map((o) => o.trim());
-  app.use(
-    cors({
-      origin: (origin: string | undefined, callback: (err: Error | null, allow: boolean) => void) => {
-        // Allow requests with no origin (mobile apps, curl, etc.)
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'), false);
-        }
-      },
-      credentials: true,
-    })
-  );
-} else {
-  // Development: allow all origins
-  app.use(cors({ credentials: true }));
-}
+// CORS configuration — allow all origins (public API)
+app.use(cors({ origin: true, credentials: true }));
 dbConnection.connect();
 
 app.use('/faculties', facultyRouter);
