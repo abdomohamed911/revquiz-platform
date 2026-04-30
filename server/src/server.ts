@@ -10,6 +10,7 @@ import questionRouter from './modules/Question/routes';
 import userRouter, { authRouter } from './modules/User/routes';
 import cors from 'cors';
 import { authLimiter, apiLimiter } from './common/middleware/rateLimiter';
+import seedController from './modules/Seed/seed.controller';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/quizzes', quizRouter);
 app.use('/questions', questionRouter);
 app.use('/users', userRouter);
 app.use('/auth', authLimiter, authRouter);
+app.post('/seed', seedController);
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError('Route not found', 'NOT_FOUND'));
 });
