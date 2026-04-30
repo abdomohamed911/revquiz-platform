@@ -1,8 +1,0 @@
-{
-  "name": "revquiz-platform",
-  "private": true,
-  "scripts": {
-    "build": "cd server && npm ci && npm run build",
-    "start": "cd server && node dist/src/server.js"
-  }
-}
