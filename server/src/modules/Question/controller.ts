@@ -6,6 +6,7 @@ import validatorMiddleware from '@/common/middleware/validators/validator';
 import { questionService } from './service';
 
 // Extend the Request interface to include the user property
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {

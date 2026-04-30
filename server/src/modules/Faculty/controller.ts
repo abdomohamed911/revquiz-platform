@@ -3,4 +3,4 @@ import { FacultyModel } from './model';
 
 export const facultyController = {
     ...baseController(FacultyModel),
-}
+};
