@@ -1,10 +1,10 @@
-import ApiError from "@/common/utils/api/ApiError";
-import ApiSuccess from "@/common/utils/api/ApiSuccess";
-import expressAsyncHandler from "express-async-handler";
-import { UserModel } from "./model";
-import { body } from "express-validator";
-import validatorMiddleware from "@/common/middleware/validators/validator";
-import jwt from "jsonwebtoken";
+import ApiError from '@/common/utils/api/ApiError';
+import ApiSuccess from '@/common/utils/api/ApiSuccess';
+import expressAsyncHandler from 'express-async-handler';
+import { UserModel } from './model';
+import { body } from 'express-validator';
+import validatorMiddleware from '@/common/middleware/validators/validator';
+import jwt from 'jsonwebtoken';
 
 export const authController = {
   signup: {
@@ -15,7 +15,7 @@ export const authController = {
         // Check if user already exists
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
-          return next(new ApiError("Email is already in use", "CONFLICT"));
+          return next(new ApiError('Email is already in use', 'CONFLICT'));
         }
 
         // Create new user
@@ -26,13 +26,13 @@ export const authController = {
           { id: user._id, email: user.email },
           process.env.JWT_SECRET!,
           {
-            expiresIn: "1h", // Token expires in 1 hour
+            expiresIn: '1h', // Token expires in 1 hour
           }
         );
 
         // Send success response with token
         res.status(201).json(
-          new ApiSuccess("OK", "User registered successfully", {
+          new ApiSuccess('OK', 'User registered successfully', {
             userId: user._id,
             token,
           })
@@ -42,12 +42,12 @@ export const authController = {
       }
     }),
     validator: [
-      body("email")
+      body('email')
         .exists()
-        .withMessage("Email is required")
+        .withMessage('Email is required')
         .isEmail()
-        .withMessage("Invalid email"),
-      body("password").exists().withMessage("Password is required"),
+        .withMessage('Invalid email'),
+      body('password').exists().withMessage('Password is required'),
       validatorMiddleware,
     ],
   },
@@ -60,7 +60,7 @@ export const authController = {
         const user = await UserModel.findOne({ email });
         if (!user) {
           return next(
-            new ApiError("Invalid email or password", "UNAUTHORIZED")
+            new ApiError('Invalid email or password', 'UNAUTHORIZED')
           );
         }
 
@@ -68,7 +68,7 @@ export const authController = {
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
           return next(
-            new ApiError("Invalid email or password", "UNAUTHORIZED")
+            new ApiError('Invalid email or password', 'UNAUTHORIZED')
           );
         }
 
@@ -77,13 +77,13 @@ export const authController = {
           { id: user._id, email: user.email },
           process.env.JWT_SECRET!,
           {
-            expiresIn: "1h", // Token expires in 1 hour
+            expiresIn: '1h', // Token expires in 1 hour
           }
         );
 
         // Send success response with token
         res.status(200).json(
-          new ApiSuccess("OK", "User logged in successfully", {
+          new ApiSuccess('OK', 'User logged in successfully', {
             userId: user._id,
             token,
           })
@@ -93,12 +93,12 @@ export const authController = {
       }
     }),
     validator: [
-      body("email")
+      body('email')
         .exists()
-        .withMessage("Email is required")
+        .withMessage('Email is required')
         .isEmail()
-        .withMessage("Invalid email"),
-      body("password").exists().withMessage("Password is required"),
+        .withMessage('Invalid email'),
+      body('password').exists().withMessage('Password is required'),
       validatorMiddleware,
     ],
   },

@@ -1,16 +1,16 @@
-import { Router } from "express";
-import { courseController as c } from "./controller";
-import { authMiddleware } from "@/common/middleware/auth";
-import { adminMiddleware } from "@/common/middleware/auth/admin";
+import { Router } from 'express';
+import { courseController as c } from './controller';
+import { authMiddleware } from '@/common/middleware/auth';
+import { adminMiddleware } from '@/common/middleware/auth/admin';
 const courseRouter = Router();
 
 courseRouter
-  .route("/")
+  .route('/')
   .get(c.getAll.validator, c.getAll.handler)
   .post(authMiddleware, adminMiddleware, c.create.validator, c.create.handler);
 
 courseRouter
-  .route("/:id")
+  .route('/:id')
   .get(c.getOne.validator, c.getOne.handler)
   .put(authMiddleware, adminMiddleware, c.update.validator, c.update.handler)
   .delete(

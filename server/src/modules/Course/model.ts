@@ -1,5 +1,5 @@
-import { addSlugMiddleware } from "@/common/middleware/mongoose/addSlugMiddleware";
-import mongoose from "mongoose";
+import { addSlugMiddleware } from '@/common/middleware/mongoose/addSlugMiddleware';
+import mongoose from 'mongoose';
 
 const courseSchema = new mongoose.Schema(
   {
@@ -15,7 +15,7 @@ const courseSchema = new mongoose.Schema(
     },
     faculty: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Faculty",
+      ref: 'Faculty',
     },
   },
 
@@ -23,5 +23,5 @@ const courseSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-addSlugMiddleware(courseSchema, "name");
-export const CourseModel = mongoose.model("Course", courseSchema);
+addSlugMiddleware(courseSchema, 'name');
+export const CourseModel = mongoose.model('Course', courseSchema);

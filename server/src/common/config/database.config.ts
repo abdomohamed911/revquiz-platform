@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const dbConnection = {
   connect: async () => {
@@ -15,7 +15,7 @@ const dbConnection = {
   close: async () => {
     try {
       await mongoose.connection.close();
-      console.log("Database Disconnected");
+      console.log('Database Disconnected');
     } catch (err: any) {
       console.error(`Database Disconnection Error: ${err.message}`);
     }

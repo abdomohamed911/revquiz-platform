@@ -1,8 +1,8 @@
-import QuestionModel from "./model";
-import UserModel from "../User/model";
-import { QuizModel } from "../Quiz/model";
-import ApiError from "@/common/utils/api/ApiError";
-import ApiSuccess from "@/common/utils/api/ApiSuccess";
+import QuestionModel from './model';
+import UserModel from '../User/model';
+import { QuizModel } from '../Quiz/model';
+import ApiError from '@/common/utils/api/ApiError';
+import ApiSuccess from '@/common/utils/api/ApiSuccess';
 
 /**
  * Solves a single question for a user.
@@ -26,11 +26,11 @@ async function solveQuestion({
   user: any;
 }) {
   // Ensure user is authenticated
-  if (!user) throw new ApiError("Unauthorized access", "UNAUTHORIZED");
+  if (!user) throw new ApiError('Unauthorized access', 'UNAUTHORIZED');
 
   // Retrieve the question by ID, explicitly include isCorrect (select:false in schema)
-  const question = await QuestionModel.findById(id).select("+options.isCorrect");
-  if (!question) throw new ApiError("Question not found", "NOT_FOUND");
+  const question = await QuestionModel.findById(id).select('+options.isCorrect');
+  if (!question) throw new ApiError('Question not found', 'NOT_FOUND');
 
   // Normalize the user's answer for case-insensitive comparison
   const normalizedUserAnswer = answer.trim().toLowerCase();
@@ -39,7 +39,7 @@ async function solveQuestion({
   const matchedOption = question.options.find(
     (opt) => opt.text.trim().toLowerCase() === normalizedUserAnswer
   );
-  if (!matchedOption) throw new ApiError("Answer not found", "NOT_FOUND");
+  if (!matchedOption) throw new ApiError('Answer not found', 'NOT_FOUND');
 
   // Determine if the user's answer is correct
   const isCorrect = matchedOption.isCorrect;
@@ -48,7 +48,7 @@ async function solveQuestion({
   await updateUserQuestionStats(user._id, question, isCorrect);
 
   // Return the result of solving the question
-  return new ApiSuccess("OK", "Question solved successfully", {
+  return new ApiSuccess('OK', 'Question solved successfully', {
     isCorrect,
     question: question.question,
     answer: matchedOption.text,
@@ -72,9 +72,9 @@ async function updateUserQuestionStats(
   // by incrementing the passed question count and adding the question to the user's record
   if (isCorrect) {
     await UserModel.findByIdAndUpdate(userId, {
-      $inc: { "score.questions.passed.count": 1 },
+      $inc: { 'score.questions.passed.count': 1 },
       $push: {
-        "score.questions.passed.questions": {
+        'score.questions.passed.questions': {
           id: question._id,
           text: question.question,
         },
@@ -84,9 +84,9 @@ async function updateUserQuestionStats(
     // If the user's answer is incorrect, update the user's stats
     // by incrementing the failed question count and adding the question to the user's record
     await UserModel.findByIdAndUpdate(userId, {
-      $inc: { "score.questions.failed.count": 1 },
+      $inc: { 'score.questions.failed.count': 1 },
       $push: {
-        "score.questions.failed.questions": {
+        'score.questions.failed.questions': {
           id: question._id,
           text: question.question,
         },
@@ -112,19 +112,19 @@ async function solveAllQuestions({
 }): Promise<ApiSuccess> {
   // Validate that answers is an array
   if (!Array.isArray(answers)) {
-    throw new ApiError("Answers must be an array", "BAD_REQUEST");
+    throw new ApiError('Answers must be an array', 'BAD_REQUEST');
   }
 
   // Check authentication before processing
   if (!user) {
-    throw new ApiError("Unauthorized access", "UNAUTHORIZED");
+    throw new ApiError('Unauthorized access', 'UNAUTHORIZED');
   }
 
   // Find all questions for the given quizId, explicitly include isCorrect (select:false in schema)
-  const questions = await QuestionModel.find({ quiz: quizId }).select("+options.isCorrect");
+  const questions = await QuestionModel.find({ quiz: quizId }).select('+options.isCorrect');
   // If no questions found, throw an error
   if (!questions.length) {
-    throw new ApiError("No questions found for this quiz", "NOT_FOUND");
+    throw new ApiError('No questions found for this quiz', 'NOT_FOUND');
   }
 
   // Initialize variables to keep track of results
@@ -173,13 +173,13 @@ async function solveAllQuestions({
 
   // Find the quiz name for the given quizId
   const quiz = await QuizModel.findById(quizId);
-  const quizName = quiz ? quiz.name : "Quiz";
+  const quizName = quiz ? quiz.name : 'Quiz';
 
   // Update the user's quiz stats
   await updateUserQuizStats(user._id, quizId, quizName, scorePercentage);
 
   // Return the results
-  return new ApiSuccess("OK", "Quiz solved successfully", {
+  return new ApiSuccess('OK', 'Quiz solved successfully', {
     totalQuestions,
     correctAnswers: correctCount,
     percentage: scorePercentage,
@@ -208,17 +208,17 @@ async function updateUserQuizStats(
   // If user passed the quiz (>= 50%), increment passed count and add to passed quizzes
   if (percentage >= 50) {
     await UserModel.findByIdAndUpdate(userId, {
-      $inc: { "score.quizzes.passed.count": 1 },
+      $inc: { 'score.quizzes.passed.count': 1 },
       $push: {
-        "score.quizzes.passed.quizzes": [{ id: quizId, name: quizName }],
+        'score.quizzes.passed.quizzes': [{ id: quizId, name: quizName }],
       },
     });
   } else {
     // Otherwise, increment failed count and add to failed quizzes
     await UserModel.findByIdAndUpdate(userId, {
-      $inc: { "score.quizzes.failed.count": 1 },
+      $inc: { 'score.quizzes.failed.count': 1 },
       $push: {
-        "score.quizzes.failed.quizzes": [{ id: quizId, name: quizName }],
+        'score.quizzes.failed.quizzes': [{ id: quizId, name: quizName }],
       },
     });
   }

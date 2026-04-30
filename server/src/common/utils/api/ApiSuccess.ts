@@ -1,17 +1,17 @@
-import { Response } from "express";
-import { HTTP_STATUS } from "@/common/constants/httpStatus"; // Import status constants
-import ApiResponse from "@/common/utils/api/ApiResponse";
+import { Response } from 'express';
+import { HTTP_STATUS } from '@/common/constants/httpStatus'; // Import status constants
+import ApiResponse from '@/common/utils/api/ApiResponse';
 
 class ApiSuccess {
   public response: ApiResponse;
   public data: object | null;
 
   constructor(
-    status: keyof (typeof HTTP_STATUS)["SUCCESS"],
+    status: keyof (typeof HTTP_STATUS)['SUCCESS'],
     message: string,
     data: object | null = null
   ) {
-    this.response = new ApiResponse(HTTP_STATUS.SUCCESS[status], "OK", message);
+    this.response = new ApiResponse(HTTP_STATUS.SUCCESS[status], 'OK', message);
     this.data = data;
   }
 
@@ -23,7 +23,7 @@ class ApiSuccess {
   /** Static method for convenience */
   static send(
     res: Response,
-    status: keyof (typeof HTTP_STATUS)["SUCCESS"],
+    status: keyof (typeof HTTP_STATUS)['SUCCESS'],
     message: string,
     data: object | null = null
   ) {

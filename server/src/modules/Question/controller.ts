@@ -1,9 +1,9 @@
-import baseController from "@/common/controllers/handlers";
-import QuestionModel from "./model";
-import expressAsyncHandler from "express-async-handler";
-import { body, param } from "express-validator";
-import validatorMiddleware from "@/common/middleware/validators/validator";
-import { questionService } from "./service";
+import baseController from '@/common/controllers/handlers';
+import QuestionModel from './model';
+import expressAsyncHandler from 'express-async-handler';
+import { body, param } from 'express-validator';
+import validatorMiddleware from '@/common/middleware/validators/validator';
+import { questionService } from './service';
 
 // Extend the Request interface to include the user property
 declare global {
@@ -33,17 +33,17 @@ export const questionController = {
       }
     }),
     validator: [
-      param("id")
+      param('id')
         .exists()
-        .withMessage("Question id is required")
+        .withMessage('Question id is required')
         .isMongoId()
-        .withMessage("Invalid question id"),
-      body("answer")
+        .withMessage('Invalid question id'),
+      body('answer')
         .isString()
-        .withMessage("Answer must be a string")
+        .withMessage('Answer must be a string')
         .trim()
         .notEmpty()
-        .withMessage("Answer is required"),
+        .withMessage('Answer is required'),
       validatorMiddleware,
     ],
   },
@@ -64,29 +64,29 @@ export const questionController = {
       }
     }),
     validator: [
-      param("quizId")
+      param('quizId')
         .exists()
-        .withMessage("Quiz ID is required")
+        .withMessage('Quiz ID is required')
         .isMongoId()
-        .withMessage("Invalid Quiz ID"),
-      body("answers")
+        .withMessage('Invalid Quiz ID'),
+      body('answers')
         .isArray()
-        .withMessage("Answers must be an array")
+        .withMessage('Answers must be an array')
         .notEmpty()
-        .withMessage("Answers array cannot be empty"),
-      body("answers.*.questionId")
+        .withMessage('Answers array cannot be empty'),
+      body('answers.*.questionId')
         .exists()
-        .withMessage("Each answer must have a questionId")
+        .withMessage('Each answer must have a questionId')
         .isMongoId()
-        .withMessage("Invalid questionId"),
-      body("answers.*.answer")
+        .withMessage('Invalid questionId'),
+      body('answers.*.answer')
         .exists()
-        .withMessage("Each answer must have an answer")
+        .withMessage('Each answer must have an answer')
         .isString()
-        .withMessage("Answer must be a string")
+        .withMessage('Answer must be a string')
         .trim()
         .notEmpty()
-        .withMessage("Answer cannot be empty"),
+        .withMessage('Answer cannot be empty'),
       validatorMiddleware,
     ],
   },

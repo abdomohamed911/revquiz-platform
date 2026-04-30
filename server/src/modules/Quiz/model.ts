@@ -1,5 +1,5 @@
-import { addSlugMiddleware } from "@/common/middleware/mongoose/addSlugMiddleware";
-import mongoose from "mongoose";
+import { addSlugMiddleware } from '@/common/middleware/mongoose/addSlugMiddleware';
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
@@ -15,15 +15,15 @@ const schema = new mongoose.Schema(
     },
     course: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Course",
+      ref: 'Course',
     },
     difficulty: {
       type: String,
       required: true,
-      enum: ["easy", "medium", "hard"],
+      enum: ['easy', 'medium', 'hard'],
     },
   },
   { timestamps: true }
 );
-addSlugMiddleware(schema, "name");
-export const QuizModel = mongoose.model("Quiz", schema);
+addSlugMiddleware(schema, 'name');
+export const QuizModel = mongoose.model('Quiz', schema);

@@ -1,11 +1,11 @@
-import type { Response } from "express";
-import { HTTP_STATUS } from "@/common/constants/httpStatus";
+import type { Response } from 'express';
+import { HTTP_STATUS } from '@/common/constants/httpStatus';
 import {
   ApiErrorDetail,
   ApiErrorResponse,
   HttpErrorStatus,
-} from "@/common/types/api.types";
-import ApiResponse from "./ApiResponse";
+} from '@/common/types/api.types';
+import ApiResponse from './ApiResponse';
 
 export default class ApiError extends Error {
   public readonly response: ApiResponse;
@@ -13,13 +13,13 @@ export default class ApiError extends Error {
 
   constructor(
     errors: ApiErrorDetail[] | string,
-    status: HttpErrorStatus = "INTERNAL_SERVER_ERROR"
+    status: HttpErrorStatus = 'INTERNAL_SERVER_ERROR'
   ) {
     const errorDetails = Array.isArray(errors) ? errors : [{ message: errors }];
     super(errorDetails[0].message);
 
     const statusCode = HTTP_STATUS.ERROR[status];
-    const statusMessage = status.replace(/_/g, " ");
+    const statusMessage = status.replace(/_/g, ' ');
 
     this.response = new ApiResponse(
       statusCode,
@@ -35,7 +35,7 @@ export default class ApiError extends Error {
     const response: ApiErrorResponse = {
       ...this.response,
       errors: this.errors,
-      ...(process.env.NODE_ENV === "development" && { stack: this.stack }),
+      ...(process.env.NODE_ENV === 'development' && { stack: this.stack }),
     };
 
     res.status(this.response.statusCode).json(response);

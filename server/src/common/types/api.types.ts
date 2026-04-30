@@ -1,8 +1,8 @@
-import { HTTP_STATUS } from "../constants/httpStatus";
+import { HTTP_STATUS } from '../constants/httpStatus';
 
 export type HttpSuccessStatus = keyof typeof HTTP_STATUS.SUCCESS;
 export type HttpErrorStatus = keyof typeof HTTP_STATUS.ERROR;
-export type ApiStatus = "success" | "fail" | "error";
+export type ApiStatus = 'success' | 'fail' | 'error';
 
 export interface ApiErrorDetail {
   message: string;

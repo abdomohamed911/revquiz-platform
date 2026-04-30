@@ -1,17 +1,17 @@
-import "tsconfig-paths/register";
+import 'tsconfig-paths/register';
 
-import express, { NextFunction, Request, Response } from "express";
-import dotenv from "dotenv";
-import facultyRouter from "./modules/Faculty/routes";
-import dbConnection from "./common/config/database.config";
-import globalError from "./common/middleware/globalError";
-import ApiError from "./common/utils/api/ApiError";
-import courseRouter from "./modules/Course/routes";
-import quizRouter from "./modules/Quiz/routes";
-import questionRouter from "./modules/Question/routes";
-import userRouter, { authRouter } from "./modules/User/routes";
-import cors from "cors";
-import { authLimiter, apiLimiter } from "./common/middleware/rateLimiter";
+import express, { NextFunction, Request, Response } from 'express';
+import dotenv from 'dotenv';
+import facultyRouter from './modules/Faculty/routes';
+import dbConnection from './common/config/database.config';
+import globalError from './common/middleware/globalError';
+import ApiError from './common/utils/api/ApiError';
+import courseRouter from './modules/Course/routes';
+import quizRouter from './modules/Quiz/routes';
+import questionRouter from './modules/Question/routes';
+import userRouter, { authRouter } from './modules/User/routes';
+import cors from 'cors';
+import { authLimiter, apiLimiter } from './common/middleware/rateLimiter';
 
 dotenv.config();
 
@@ -28,14 +28,14 @@ app.use(
 );
 dbConnection.connect();
 
-app.use("/faculties", facultyRouter);
-app.use("/courses", courseRouter);
-app.use("/quizzes", quizRouter);
-app.use("/questions", questionRouter);
-app.use("/users", userRouter);
-app.use("/auth", authLimiter, authRouter);
-app.all("*", (req: Request, res: Response, next: NextFunction) => {
-  next(new ApiError("Route not found", "NOT_FOUND"));
+app.use('/faculties', facultyRouter);
+app.use('/courses', courseRouter);
+app.use('/quizzes', quizRouter);
+app.use('/questions', questionRouter);
+app.use('/users', userRouter);
+app.use('/auth', authLimiter, authRouter);
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new ApiError('Route not found', 'NOT_FOUND'));
 });
 app.use(globalError);
 
@@ -43,8 +43,8 @@ const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-process.on("unhandledRejection", (err: Error) => {
+process.on('unhandledRejection', (err: Error) => {
   console.error(`Internal Server Error: ${err.name} | ${err.message}`);
-  console.error("shutting down...");
+  console.error('shutting down...');
   server.close(() => process.exit(1));
 });

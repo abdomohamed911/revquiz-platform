@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
   question: {
@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
   },
   quiz: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Quiz",
+    ref: 'Quiz',
   },
   options: [
     {
@@ -24,5 +24,5 @@ const schema = new mongoose.Schema({
     },
   ],
 });
-const QuestionModel = mongoose.model("Question", schema);
+const QuestionModel = mongoose.model('Question', schema);
 export default QuestionModel;

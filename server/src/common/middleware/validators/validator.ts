@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import ApiError from "@/common/utils/api/ApiError";
-import type { Request, Response, NextFunction } from "express";
-import { validationResult, ValidationError } from "express-validator";
+import ApiError from '@/common/utils/api/ApiError';
+import type { Request, Response, NextFunction } from 'express';
+import { validationResult, ValidationError } from 'express-validator';
 
 interface ApiErrorDetail {
   message: string;
@@ -37,7 +37,7 @@ export default function validatorMiddleware(
       }
     });
 
-    return next(new ApiError(errorMessages, "BAD_REQUEST"));
+    return next(new ApiError(errorMessages, 'BAD_REQUEST'));
   }
   next();
 }

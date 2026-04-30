@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response } from "express";
-import ApiSuccess from "@/common/utils/api/ApiSuccess";
-import expressAsyncHandler from "express-async-handler";
-import { Model } from "mongoose";
-import baseServices from "../services";
-import validatorMiddleware from "@/common/middleware/validators/validator";
-import { body, oneOf, param, ValidationChain } from "express-validator";
-import generateValidator from "@/common/utils/validatorsGenerator";
+import { Request, Response } from 'express';
+import ApiSuccess from '@/common/utils/api/ApiSuccess';
+import expressAsyncHandler from 'express-async-handler';
+import { Model } from 'mongoose';
+import baseServices from '../services';
+import validatorMiddleware from '@/common/middleware/validators/validator';
+import { body, oneOf, param, ValidationChain } from 'express-validator';
+import generateValidator from '@/common/utils/validatorsGenerator';
 
 type ValidatorMap = {
   [field: string]: ValidationChain[];
@@ -40,18 +40,18 @@ export default function baseController(
         };
 
   // Always exclude 'slug' and 'id'
-  normalizedExcludedData.create.push("slug", "id");
-  normalizedExcludedData.update.push("slug", "id");
-  excludeValidation.push("slug", "id");
+  normalizedExcludedData.create.push('slug', 'id');
+  normalizedExcludedData.update.push('slug', 'id');
+  excludeValidation.push('slug', 'id');
 
   const s = baseServices(model);
 
   const updatableFields = Object.keys(model.schema.paths).filter(
     (key) =>
       !normalizedExcludedData.update.includes(key) &&
-      key !== "_id" &&
-      key !== "__v" &&
-      !key.includes(".")
+      key !== '_id' &&
+      key !== '__v' &&
+      !key.includes('.')
   );
 
   const buildCustomValidators = (map: ValidatorMap) =>
@@ -62,10 +62,10 @@ export default function baseController(
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
         const { id } = req.params;
         const result = await s.deleteOne(id);
-        ApiSuccess.send(res, "OK", "document deleted", result);
+        ApiSuccess.send(res, 'OK', 'document deleted', result);
       }),
       validator: [
-        param("id").exists().withMessage("id is required").isMongoId(),
+        param('id').exists().withMessage('id is required').isMongoId(),
         validatorMiddleware,
       ],
     },
@@ -78,20 +78,20 @@ export default function baseController(
           updatedData,
           normalizedExcludedData.update
         );
-        ApiSuccess.send(res, "OK", "document updated", result);
+        ApiSuccess.send(res, 'OK', 'document updated', result);
       }),
       validator: [
-        param("id").exists().withMessage("id is required").isMongoId(),
+        param('id').exists().withMessage('id is required').isMongoId(),
         oneOf(
           updatableFields.map((field) =>
             body(field).exists().withMessage(`${field} must be provided`)
           ),
           {
-            message: "At least one valid field must be provided to update",
+            message: 'At least one valid field must be provided to update',
           }
         ),
         ...buildCustomValidators(customValidators.update || {}),
-        ...generateValidator(model, excludeValidation, "update"),
+        ...generateValidator(model, excludeValidation, 'update'),
         validatorMiddleware,
       ],
     },
@@ -99,11 +99,11 @@ export default function baseController(
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
         const data = req.body;
         const result = await s.create(data, normalizedExcludedData.create);
-        ApiSuccess.send(res, "CREATED", "document created", result);
+        ApiSuccess.send(res, 'CREATED', 'document created', result);
       }),
       validator: [
         ...buildCustomValidators(customValidators.create || {}),
-        ...generateValidator(model, excludeValidation, "create"),
+        ...generateValidator(model, excludeValidation, 'create'),
         validatorMiddleware,
       ],
     },
@@ -111,10 +111,10 @@ export default function baseController(
       handler: expressAsyncHandler(async (req: Request, res: Response) => {
         const { id } = req.params;
         const result = await s.getOne(id);
-        ApiSuccess.send(res, "OK", "document found", result);
+        ApiSuccess.send(res, 'OK', 'document found', result);
       }),
       validator: [
-        param("id").exists().withMessage("id is required").isMongoId(),
+        param('id').exists().withMessage('id is required').isMongoId(),
         validatorMiddleware,
       ],
     },
@@ -123,12 +123,12 @@ export default function baseController(
         // Only use req.query (params) for filtering, sorting, etc. Ignore body.
         const queryParams: { [key: string]: string } = {};
         Object.entries(req.query).forEach(([key, value]) => {
-          if (typeof value === "string") queryParams[key] = value;
-          else if (Array.isArray(value)) queryParams[key] = value.join(",");
+          if (typeof value === 'string') queryParams[key] = value;
+          else if (Array.isArray(value)) queryParams[key] = value.join(',');
           else if (value !== undefined) queryParams[key] = String(value);
         });
         const result = await s.getAll(queryParams);
-        ApiSuccess.send(res, "OK", "documents found", result);
+        ApiSuccess.send(res, 'OK', 'documents found', result);
       }),
       validator: [],
     },

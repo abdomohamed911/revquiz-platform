@@ -20,7 +20,7 @@ export class ApiFeatures {
   pagination: IPagination;
   searchFields: string[];
 
-  constructor(mongooseQuery: any, queryParams: IRequestBody, searchFields: string[] = ["name"]) {
+  constructor(mongooseQuery: any, queryParams: IRequestBody, searchFields: string[] = ['name']) {
     this.mongooseQuery = mongooseQuery;
     this.queryParams = queryParams;
     this.searchFields = searchFields;
@@ -35,20 +35,20 @@ export class ApiFeatures {
   filter() {
     // Reserved keys that are not filters
     const reserved = [
-      "sort",
-      "fields",
-      "keywords",
-      "page",
-      "limit",
-      "populate",
-      "filters",
+      'sort',
+      'fields',
+      'keywords',
+      'page',
+      'limit',
+      'populate',
+      'filters',
     ];
     // Use all non-reserved keys as filters
     const queryFilters: Record<string, any> = {};
     for (const [key, value] of Object.entries(this.queryParams)) {
-      if (!reserved.includes(key) && value !== undefined && value !== "") {
+      if (!reserved.includes(key) && value !== undefined && value !== '') {
         // Support for advanced filtering (e.g., price[gte]=10)
-        if (key.includes("[")) {
+        if (key.includes('[')) {
           const match = key.match(/(\w+)\[(\w+)\]/);
           if (match) {
             const field = match[1];
@@ -68,10 +68,10 @@ export class ApiFeatures {
   sort() {
     const sortValue = this.queryParams.sort;
     if (sortValue) {
-      const sortBy = sortValue.split(" ").join(" ");
+      const sortBy = sortValue.split(' ').join(' ');
       this.mongooseQuery = this.mongooseQuery.sort(sortBy);
     } else {
-      this.mongooseQuery = this.mongooseQuery.sort("-createdAt");
+      this.mongooseQuery = this.mongooseQuery.sort('-createdAt');
     }
     return this;
   }
@@ -79,10 +79,10 @@ export class ApiFeatures {
   limitFields() {
     const fieldsValue = this.queryParams.fields;
     if (fieldsValue) {
-      const fields = fieldsValue.split(",").join(" ");
+      const fields = fieldsValue.split(',').join(' ');
       this.mongooseQuery = this.mongooseQuery.select(fields);
     } else {
-      this.mongooseQuery = this.mongooseQuery.select("-createdAt -__v");
+      this.mongooseQuery = this.mongooseQuery.select('-createdAt -__v');
     }
     return this;
   }
@@ -92,7 +92,7 @@ export class ApiFeatures {
     if (keywordsValue) {
       const keywords = keywordsValue;
       const orConditions = this.searchFields.map((field) => ({
-        [field]: { $regex: keywords, $options: "i" },
+        [field]: { $regex: keywords, $options: 'i' },
       }));
       this.mongooseQuery = this.mongooseQuery.find({ $or: orConditions });
     }
@@ -102,8 +102,8 @@ export class ApiFeatures {
   paginate(documentsCount?: number) {
     const pageValue = this.queryParams.page;
     const limitValue = this.queryParams.limit;
-    const page = parseInt(pageValue || "1") * 1 || 1;
-    const limit = parseInt(limitValue || "20") || 20;
+    const page = parseInt(pageValue || '1') * 1 || 1;
+    const limit = parseInt(limitValue || '20') || 20;
     const skip = (page - 1) * limit;
     this.mongooseQuery = this.mongooseQuery.skip(skip).limit(limit);
     this.pagination.currentPage = page;

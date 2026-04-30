@@ -1,4 +1,4 @@
-import { ApiResponseBase, ApiStatus } from "@/common/types/api.types";
+import { ApiResponseBase, ApiStatus } from '@/common/types/api.types';
 
 export default class ApiResponse implements ApiResponseBase {
   public readonly statusCode: number;
@@ -16,8 +16,8 @@ export default class ApiResponse implements ApiResponseBase {
   }
 
   private determineStatus(statusCode: number): ApiStatus {
-    if (statusCode >= 200 && statusCode < 300) return "success";
-    if (statusCode >= 400 && statusCode < 500) return "fail";
-    return "error";
+    if (statusCode >= 200 && statusCode < 300) return 'success';
+    if (statusCode >= 400 && statusCode < 500) return 'fail';
+    return 'error';
   }
 }

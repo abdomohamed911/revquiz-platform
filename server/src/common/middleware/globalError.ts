@@ -1,27 +1,27 @@
-import type { NextFunction, Request, Response } from "express";
-import { Error as MongooseError } from "mongoose";
-import ApiError from "../utils/api/ApiError";
-import { ERROR_MAPPINGS } from "../constants/error.constants";
-import { ErrorType } from "../types/error.types";
+import type { NextFunction, Request, Response } from 'express';
+import { Error as MongooseError } from 'mongoose';
+import ApiError from '../utils/api/ApiError';
+import { ERROR_MAPPINGS } from '../constants/error.constants';
+import { ErrorType } from '../types/error.types';
 
 class ErrorHandler {
   private static getErrorName(err: ErrorType): string {
     if (err instanceof MongooseError) {
       return err.name;
     }
-    if (err.name === "MongoError") {
-      return "MongoServerError";
+    if (err.name === 'MongoError') {
+      return 'MongoServerError';
     }
-    return err.name || "Error";
+    return err.name || 'Error';
   }
 
   public static handleError(err: ErrorType): ApiError {
     // Log error in development
-    // if (process.env.NODE_ENV === "development") {
+    // if (process.env.NODE_ENV === 'development') {
     //   console.error({
     //     type: err.constructor.name,
     //     name: err.name,
-    //     code: "code" in err ? err.code : undefined,
+    //     code: 'code' in err ? err.code : undefined,
     //     message: err.message,
     //   });
 
@@ -39,11 +39,11 @@ class ErrorHandler {
         return new ApiError(details, status);
       }
     } catch (error) {
-      console.error("Error handling failed:", error);
+      console.error('Error handling failed:', error);
     }
 
     // Default error handling
-    return new ApiError(err.message, "INTERNAL_SERVER_ERROR");
+    return new ApiError(err.message, 'INTERNAL_SERVER_ERROR');
   }
 }
 

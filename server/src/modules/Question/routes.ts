@@ -1,17 +1,17 @@
-import { Router } from "express";
-import { questionController as c } from "./controller";
-import { authMiddleware } from "@/common/middleware/auth";
-import { adminMiddleware } from "@/common/middleware/auth/admin";
+import { Router } from 'express';
+import { questionController as c } from './controller';
+import { authMiddleware } from '@/common/middleware/auth';
+import { adminMiddleware } from '@/common/middleware/auth/admin';
 
 const questionRouter = Router();
 
 questionRouter
-  .route("/")
+  .route('/')
   .get(authMiddleware, c.getAll.validator, c.getAll.handler)
   .post(authMiddleware, adminMiddleware, c.create.validator, c.create.handler);
 
 questionRouter
-  .route("/:id")
+  .route('/:id')
   .get(authMiddleware, c.getOne.validator, c.getOne.handler)
   .put(authMiddleware, adminMiddleware, c.update.validator, c.update.handler)
   .delete(
@@ -22,13 +22,13 @@ questionRouter
   );
 
 questionRouter.post(
-  "/:id/solve",
+  '/:id/solve',
   authMiddleware, // Protect this route
   c.solveQuestion.validator,
   c.solveQuestion.handler
 );
 questionRouter.post(
-  "/quiz/:quizId/solve",
+  '/quiz/:quizId/solve',
   authMiddleware, // Protect this route
   c.solveAllQuestions.validator,
   c.solveAllQuestions.handler

@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   email: string;
@@ -57,8 +57,8 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ["admin", "user"],
-    default: "user",
+    enum: ['admin', 'user'],
+    default: 'user',
   },
   score: {
     quizzes: {
@@ -71,7 +71,7 @@ const UserSchema = new Schema<IUser>({
           {
             id: {
               type: Schema.Types.ObjectId,
-              ref: "Quiz",
+              ref: 'Quiz',
             },
             name: {
               type: String,
@@ -88,7 +88,7 @@ const UserSchema = new Schema<IUser>({
           {
             id: {
               type: Schema.Types.ObjectId,
-              ref: "Quiz",
+              ref: 'Quiz',
             },
             name: {
               type: String,
@@ -107,7 +107,7 @@ const UserSchema = new Schema<IUser>({
           {
             id: {
               type: Schema.Types.ObjectId,
-              ref: "Question",
+              ref: 'Question',
             },
             text: {
               type: String,
@@ -124,7 +124,7 @@ const UserSchema = new Schema<IUser>({
           {
             id: {
               type: Schema.Types.ObjectId,
-              ref: "Question",
+              ref: 'Question',
             },
             text: {
               type: String,
@@ -137,8 +137,8 @@ const UserSchema = new Schema<IUser>({
 });
 
 // Hash password before saving
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -151,7 +151,7 @@ UserSchema.methods.comparePassword = async function (
 };
 
 // Virtual field for overall score
-UserSchema.virtual("score.overall").get(function () {
+UserSchema.virtual('score.overall').get(function () {
   const quizzesPassed = this.score.quizzes.passed.count || 0;
   const quizzesFailed = this.score.quizzes.failed.count || 0;
   const questionsPassed = this.score.questions.passed.count || 0;
@@ -164,7 +164,7 @@ UserSchema.virtual("score.overall").get(function () {
 });
 
 export const UserModel: Model<IUser> = mongoose.model<IUser>(
-  "User",
+  'User',
   UserSchema
 );
 export default UserModel;

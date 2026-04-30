@@ -1,8 +1,8 @@
-import baseController from "@/common/controllers/handlers";
-import { UserModel } from "./model";
-import ApiError from "@/common/utils/api/ApiError";
-import ApiSuccess from "@/common/utils/api/ApiSuccess";
-import expressAsyncHandler from "express-async-handler";
+import baseController from '@/common/controllers/handlers';
+import { UserModel } from './model';
+import ApiError from '@/common/utils/api/ApiError';
+import ApiSuccess from '@/common/utils/api/ApiSuccess';
+import expressAsyncHandler from 'express-async-handler';
 
 export const userController = {
   ...baseController(UserModel),
@@ -11,18 +11,18 @@ export const userController = {
       try {
         const user = req.user; // Authenticated user
         if (!user) {
-          return next(new ApiError("Unauthorized access", "UNAUTHORIZED"));
+          return next(new ApiError('Unauthorized access', 'UNAUTHORIZED'));
         }
 
-        const userData = await UserModel.findById(user._id).select("-password");
+        const userData = await UserModel.findById(user._id).select('-password');
         if (!userData) {
-          return next(new ApiError("User not found", "NOT_FOUND"));
+          return next(new ApiError('User not found', 'NOT_FOUND'));
         }
 
         ApiSuccess.send(
           res,
-          "OK",
-          "User profile fetched successfully",
+          'OK',
+          'User profile fetched successfully',
           userData
         );
       } catch (error) {
