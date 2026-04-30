@@ -4,14 +4,14 @@ WORKDIR /app
 
 # Install dependencies
 FROM base AS deps
-COPY server/package.json server/pnpm-lock.yaml* ./
-RUN corepack enable && pnpm install --frozen-lockfile
+COPY server/package.json server/package-lock.json* ./
+RUN npm ci --omit=dev
 
 # Build
 FROM base AS builder
 COPY server/ ./
 COPY --from=deps /app/node_modules ./node_modules
-RUN corepack enable && pnpm build
+RUN npm run build
 
 # Production
 FROM base AS runner

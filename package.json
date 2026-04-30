@@ -4,16 +4,16 @@
   "private": true,
   "description": "Full-stack quiz platform for students - faculty selection, course quizzes, difficulty levels, and admin content management",
   "scripts": {
-    "dev:server": "cd server && pnpm dev",
+    "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm start",
-    "build:server": "cd server && pnpm build",
+    "build:server": "cd server && npm run build",
     "build:client": "cd client && npm run build",
-    "seed": "cd server && pnpm ts-node -r tsconfig-paths/register scripts/seeder.ts",
-    "test:server": "cd server && pnpm test",
-    "lint:server": "cd server && pnpm lint",
+    "seed": "cd server && npx ts-node -r tsconfig-paths/register scripts/seeder.ts",
+    "test:server": "cd server && npm test",
+    "lint:server": "cd server && npm run lint",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down",
-    "docker:seed": "docker compose exec server pnpm ts-node -r tsconfig-paths/register scripts/seeder.ts"
+    "docker:seed": "docker compose exec server npx ts-node -r tsconfig-paths/register scripts/seeder.ts"
   },
   "keywords": ["quiz", "education", "fullstack", "react", "express", "typescript", "mongodb"],
   "author": "Abdelrahman Mohamed",
