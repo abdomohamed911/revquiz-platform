@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_DATABASE: revquiz-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: server/pnpm-lock.yaml
+
+      - name: Install server dependencies
+        working-directory: server
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint server
+        working-directory: server
+        run: pnpm lint
+        env:
+          DB_URL: mongodb://localhost:27017
+          DB_NAME: revquiz-test
+          JWT_SECRET: test-secret-for-ci-only
+
+      - name: Type check server
+        working-directory: server
+        run: pnpm tsc --noEmit
+        env:
+          DB_URL: mongodb://localhost:27017
+          DB_NAME: revquiz-test
+          JWT_SECRET: test-secret-for-ci-only
+
+      - name: Run server tests
+        working-directory: server
+        run: pnpm test -- --coverage
+        env:
+          DB_URL: mongodb://localhost:27017
+          DB_NAME: revquiz-test
+          JWT_SECRET: test-secret-for-ci-only
+          NODE_ENV: test

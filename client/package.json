@@ -11,15 +11,14 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "lucide-react": "^0.487.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^6.30.0",
     "react-scripts": "^5.0.1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["quiz", "education", "react"],
+  "author": "Abdelrahman Mohamed",
+  "license": "MIT",
   "browserslist": {
     "production": [
       ">0.2%",

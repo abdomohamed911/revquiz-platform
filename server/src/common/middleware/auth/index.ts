@@ -1,4 +1,3 @@
-// filepath: e:\IT\Coding\Projects\College projects\3th\WebPrograming\RevQuiz\server\src\common\middleware\auth\index.ts
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import ApiError from "@/common/utils/api/ApiError";

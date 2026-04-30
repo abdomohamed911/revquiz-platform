@@ -28,8 +28,8 @@ async function solveQuestion({
   // Ensure user is authenticated
   if (!user) throw new ApiError("Unauthorized access", "UNAUTHORIZED");
 
-  // Retrieve the question by ID
-  const question = await QuestionModel.findById(id);
+  // Retrieve the question by ID, explicitly include isCorrect (select:false in schema)
+  const question = await QuestionModel.findById(id).select("+options.isCorrect");
   if (!question) throw new ApiError("Question not found", "NOT_FOUND");
 
   // Normalize the user's answer for case-insensitive comparison
@@ -115,8 +115,13 @@ async function solveAllQuestions({
     throw new ApiError("Answers must be an array", "BAD_REQUEST");
   }
 
-  // Find all questions for the given quizId
-  const questions = await QuestionModel.find({ quiz: quizId });
+  // Check authentication before processing
+  if (!user) {
+    throw new ApiError("Unauthorized access", "UNAUTHORIZED");
+  }
+
+  // Find all questions for the given quizId, explicitly include isCorrect (select:false in schema)
+  const questions = await QuestionModel.find({ quiz: quizId }).select("+options.isCorrect");
   // If no questions found, throw an error
   if (!questions.length) {
     throw new ApiError("No questions found for this quiz", "NOT_FOUND");
@@ -165,11 +170,6 @@ async function solveAllQuestions({
   // Calculate the total questions and score percentage
   const totalQuestions = questions.length;
   const scorePercentage = (correctCount / totalQuestions) * 100;
-
-  // If the user is not logged in, throw an error
-  if (!user) {
-    throw new ApiError("Unauthorized access", "UNAUTHORIZED");
-  }
 
   // Find the quiz name for the given quizId
   const quiz = await QuizModel.findById(quizId);

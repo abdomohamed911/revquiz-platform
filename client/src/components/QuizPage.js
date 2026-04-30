@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../lib/axios";
 
 function QuizPage() {
   const { faculty, course, difficulty, quiz: quizName } = useParams();
   const [questions, setQuestions] = useState([]);
+  const [quizId, setQuizId] = useState(null);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
-  const [answers, setAnswers] = useState([]); // To store all answers for submit
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quizNameState, setQuizNameState] = useState("");
   const navigate = useNavigate();
+  const isSubmitting = useRef(false);
 
   useEffect(() => {
-    // Check authentication before fetching questions
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login", {
@@ -27,7 +28,7 @@ function QuizPage() {
       });
       return;
     }
-    // Fetch the quiz by name to get its ID
+
     api
       .get("/quizzes", { params: { name: quizName } })
       .then((quizRes) => {
@@ -38,20 +39,18 @@ function QuizPage() {
           return;
         }
         setQuizNameState(quiz.name);
-        // Now fetch questions by quiz ID
-        api
-          .get("/questions", {
-            params: { quiz: quiz._id },
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((res) => {
-            setQuestions(res.data.data.data || []);
-            setLoading(false);
-          })
-          .catch(() => {
-            setError("Failed to load questions");
-            setLoading(false);
-          });
+        setQuizId(quiz._id);
+
+        return api.get("/questions", {
+          params: { quiz: quiz._id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      })
+      .then((res) => {
+        if (res) {
+          setQuestions(res.data.data.data || []);
+        }
+        setLoading(false);
       })
       .catch(() => {
         setError("Failed to load quiz");
@@ -60,55 +59,62 @@ function QuizPage() {
   }, [quizName, navigate]);
 
   const handleAnswer = async (opt) => {
+    if (isSubmitting.current) return;
     setSelectedId(opt._id);
     setIsCorrectAnswer(opt.isCorrect);
-    // Save answer for later submission
-    setAnswers((prev) => [
-      ...prev,
-      { questionId: questions[current]._id, answer: opt.text },
-    ]);
-    // Call solve for this question
+
+    const currentAnswer = {
+      questionId: questions[current]._id,
+      answer: opt.text,
+    };
+    const updatedAnswers = [...answers, currentAnswer];
+    setAnswers(updatedAnswers);
+
+    const token = localStorage.getItem("token");
     try {
       await api.post(
         `/questions/${questions[current]._id}/solve`,
         { answer: opt.text },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-    } catch {}
+    } catch {
+      // Individual solve failed silently, quiz-level submission handles scoring
+    }
+
     if (opt.isCorrect) {
       setScore((prev) => prev + 1);
     }
+
+    const finalScore = opt.isCorrect ? score + 1 : score;
+
     setTimeout(() => {
       if (current + 1 < questions.length) {
         setCurrent(current + 1);
         setSelectedId(null);
         setIsCorrectAnswer(null);
       } else {
-        // Submit all answers for the quiz
+        isSubmitting.current = true;
         api
           .post(
-            `/questions/quiz/${questions[0]?.quiz || ""}/solve`,
-            { answers },
+            `/questions/quiz/${quizId}/solve`,
+            { answers: updatedAnswers },
             {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }
           )
           .finally(() => {
             navigate(
               `/faculties/${faculty}/courses/${course}/difficulty/${difficulty}/quizzes/${quizName}/results`,
-              { state: { score: opt.isCorrect ? score + 1 : score } }
+              { state: { score: finalScore, total: questions.length } }
             );
           });
       }
     }, 700);
   };
 
-  if (loading) return <div>Loading questions...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <div className="page"><p>Loading questions...</p></div>;
+  if (error) return <div className="page"><p>{error}</p></div>;
+  if (questions.length === 0) return <div className="page"><p>No questions available for this quiz.</p></div>;
 
   const progressPercent = ((current + 1) / questions.length) * 100;
 
@@ -133,7 +139,7 @@ function QuizPage() {
           }}
         ></div>
       </div>
-      <h2>Question {current + 1}</h2>
+      <h2>Question {current + 1} of {questions.length}</h2>
       <p>{questions[current]?.question}</p>
       <div className="grid">
         {questions[current]?.options.map((opt) => (

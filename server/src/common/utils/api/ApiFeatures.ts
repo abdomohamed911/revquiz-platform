@@ -18,10 +18,12 @@ export class ApiFeatures {
   mongooseQuery;
   queryParams: IRequestBody;
   pagination: IPagination;
+  searchFields: string[];
 
-  constructor(mongooseQuery: any, queryParams: IRequestBody) {
+  constructor(mongooseQuery: any, queryParams: IRequestBody, searchFields: string[] = ["name"]) {
     this.mongooseQuery = mongooseQuery;
     this.queryParams = queryParams;
+    this.searchFields = searchFields;
     this.pagination = {
       currentPage: 1,
       limit: 20,
@@ -89,12 +91,10 @@ export class ApiFeatures {
     const keywordsValue = this.queryParams.keywords;
     if (keywordsValue) {
       const keywords = keywordsValue;
-      this.mongooseQuery = this.mongooseQuery.find({
-        $or: [
-          { title: { $regex: keywords, $options: "i" } },
-          { description: { $regex: keywords, $options: "i" } },
-        ],
-      });
+      const orConditions = this.searchFields.map((field) => ({
+        [field]: { $regex: keywords, $options: "i" },
+      }));
+      this.mongooseQuery = this.mongooseQuery.find({ $or: orConditions });
     }
     return this;
   }

@@ -6,12 +6,16 @@ import { QuizModel } from "@/modules/Quiz/model";
 import QuestionModel from "@/modules/Question/model";
 import { UserModel } from "@/modules/User/model";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
 
-const MONGODB_URI = "mongodb://localhost:27017/test-revQuiz"; // change as needed
+dotenv.config({ path: "../../.env" });
+
+const MONGODB_URI = process.env.DB_URL || "mongodb://localhost:27017/revquiz";
+const DB_NAME = process.env.DB_NAME || "revquiz";
 
 async function seed() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, { dbName: DB_NAME });
     console.log("✅ Connected to MongoDB");
 
     // Clear existing data
@@ -56,8 +60,7 @@ async function seed() {
 
         for (let qz = 0; qz < 2; qz++) {
           const quiz = await QuizModel.create({
-            name: `${faker.lorem.words(3)}-${faker.string.uuid()}`, // Ensure unique quiz name
-            description: faker.lorem.sentence(),
+            name: `${faker.lorem.words(3)}-${faker.string.uuid()}`,
             course: course._id,
             difficulty: faker.helpers.arrayElement(["easy", "medium", "hard"]),
           });
