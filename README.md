@@ -4,22 +4,27 @@
 
 A full-stack quiz platform for Alamein International University. Students select their faculty, course, and difficulty level, then take quizzes with real-time scoring and persistent score tracking.
 
+## Screenshots
+
+![RevQuiz Home](/docs/home.png)
+
 ## Live Demo
 
 | Resource | URL |
 |---|---|
-| **Frontend** | [https://revquiz-azure.vercel.app](https://revquiz-azure.vercel.app) |
-| **API** | [https://revquiz-server-production.up.railway.app](https://revquiz-server-production.up.railway.app) |
+| **Frontend (Vercel)** | [https://revquiz-platform.vercel.app](https://revquiz-platform.vercel.app) |
+| **Backend (AWS EC2)** | Pending deployment |
+| **Health Check** | Pending deployment (`/api/health`) |
 | **Demo Login** | `demo@test.com` / `Demo123!` |
 | **Admin Login** | `admin@test.com` / `Admin123!` |
 
 ## What It Does
 
-RevQuiz lets students practice course material through structured quizzes. The workflow is: pick faculty, pick course, pick difficulty, take quiz, see results. An admin panel allows content managers to create faculties, courses, quizzes, and questions through a CRUD interface. All quiz data is stored in MongoDB and user scores persist across sessions.
+RevQuiz lets students practice course material through structured quizzes. The workflow is: pick faculty, pick course, pick difficulty, take quiz, see results. An admin panel allows content managers to create faculties, courses, quizzes, and questions through a CRUD interface. All quiz data is stored in MongoDB Atlas and user scores persist across sessions. The platform supports three difficulty levels (easy, medium, hard), per-question and per-quiz solving with immediate feedback, and role-based access control separating student and admin views.
 
 ## Why I Built It
 
-This started as a university web programming course project at Alamein International University. The goal was to move beyond todo-list tutorials and build something with real CRUD relationships (faculties contain courses, courses contain quizzes, quizzes contain questions with correct/incorrect options), user authentication, and role-based access control. It was my first exposure to building a full TypeScript backend with Mongoose.
+This started as a university web programming course project at Alamein International University. The goal was to move beyond todo-list tutorials and build something with real CRUD relationships (faculties contain courses, courses contain quizzes, quizzes contain questions with correct/incorrect options), user authentication, and role-based access control. It was my first exposure to building a full TypeScript backend with Mongoose, and I wanted to push beyond basic CRUD by implementing quiz-solving logic with score tracking, difficulty-based question filtering, and an admin panel for content management.
 
 ## Tech Stack
 
@@ -27,34 +32,41 @@ This started as a university web programming course project at Alamein Internati
 |---|---|
 | Frontend | React 19, JavaScript, Tailwind CSS |
 | Backend | Express 4, TypeScript (strict mode), Node.js 20 |
-| Database | MongoDB (Railway) with Mongoose ODM |
+| Database | MongoDB Atlas (M0 Free Tier) with Mongoose ODM |
 | Auth | JWT with bcryptjs password hashing |
 | Rate Limiting | express-rate-limit (10 req/15min on auth) |
-| Testing | Jest, Supertest, ts-jest |
+| Testing | Jest, Supertest, ts-jest (76 unit tests, 9 suites) |
 | CI/CD | GitHub Actions (lint + typecheck + build + test) |
-| Deployment | Railway (backend) + Vercel (frontend) |
-| Containerization | Docker + docker-compose (MongoDB + server + nginx) |
+| Deployment | AWS EC2 + Docker (backend) + Vercel (frontend) |
+| Containerization | Docker multi-stage build + docker-compose |
 
 ## Architecture
 
 ```mermaid
 graph TD
-    Client[React Client - Vercel] -->|HTTP/REST| Server[Express Server - Railway]
+    Client[React Client - Vercel] -->|HTTPS/REST| Nginx[Nginx Reverse Proxy - EC2]
+    Nginx --> Server[Express Server - Docker Container]
     Server --> AuthMW[Auth Middleware]
-    AuthMW -->|JWT verify| UserDB[(MongoDB: users)]
+    AuthMW -->|JWT verify| UserDB[(MongoDB Atlas: users)]
     Server --> FacultyAPI[Faculty API]
     Server --> CourseAPI[Course API]
     Server --> QuizAPI[Quiz API]
     Server --> QuestionAPI[Question API]
-    FacultyAPI --> CourseDB[(MongoDB: faculties)]
+    FacultyAPI --> CourseDB[(MongoDB Atlas: faculties)]
     CourseAPI --> CourseDB
-    CourseAPI --> QuizDB[(MongoDB: quizzes)]
+    CourseAPI --> QuizDB[(MongoDB Atlas: quizzes)]
     QuizAPI --> QuizDB
-    QuestionAPI --> QuestionDB[(MongoDB: questions)]
+    QuestionAPI --> QuestionDB[(MongoDB Atlas: questions)]
     QuestionAPI --> UserDB
 ```
 
 ## API Endpoints
+
+### Health
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/health` | No | Health check (returns `{ ok: true, timestamp }`) |
 
 ### Auth
 
@@ -136,37 +148,45 @@ After running the seeder, use these accounts:
 
 ## Deployment
 
-### Backend (Railway)
+### Backend (AWS EC2 + Docker)
 
-1. Connect `abdomohamed911/revquiz-platform` to [Railway](https://railway.app)
-2. Root directory: `/server`
-3. Build command: `npm ci && npm run build`
-4. Start command: `npm start`
-5. Environment variables:
-   - `MONGODB_URI` — Your MongoDB Atlas connection string
-   - `JWT_SECRET` — A random 32+ character string
-   - `CORS_ORIGIN` — Your Vercel frontend URL (e.g., `https://revquiz.vercel.app`)
-   - `NODE_ENV=production`
+The backend runs in a Docker container on an EC2 t2.micro (free tier) instance behind an nginx reverse proxy with TLS (Let's Encrypt).
+
+1. Launch EC2 t2.micro (Ubuntu 22.04, free tier)
+2. Install Docker and docker-compose
+3. Clone the repo and configure environment variables
+4. Run `docker compose up -d --build`
+5. Configure nginx as reverse proxy with Let's Encrypt SSL
+
+Environment variables for the server container:
+
+| Variable | Description |
+|---|---|
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `JWT_SECRET` | Random 32+ character string |
+| `CORS_ORIGIN` | Vercel frontend URL (comma-separated for multiple) |
+| `NODE_ENV` | `production` |
+| `SEED_KEY` | Key required to trigger the `/seed` endpoint |
 
 ### Frontend (Vercel)
 
-1. Connect `abdomohamed911/revquiz-platform` to [Vercel](https://vercel.com)
+1. Import `abdomohamed911/revquiz-platform` on [Vercel](https://vercel.com)
 2. Root directory: `/client`
-3. Framework preset: Create React App (detected automatically)
+3. Framework preset: Create React App (auto-detected)
 4. Environment variables:
-   - `REACT_APP_API_URL` — Your Railway backend URL (e.g., `https://revquiz-server.up.railway.app`)
+   - `REACT_APP_API_URL` — Your EC2 backend HTTPS URL
 
 ### Seeding Production
 
-After both deployments are live, seed the production database by sending a POST request to the `/seed` endpoint with the `X-Seed-Key` header:
+After the backend is deployed, seed the production database by sending a POST request to the `/seed` endpoint with the `X-Seed-Key` header:
 
 ```bash
-curl -X POST https://revquiz-server-production.up.railway.app/seed \
+curl -X POST https://your-ec2-domain.com/seed \
   -H "Content-Type: application/json" \
   -H "X-Seed-Key: your-seed-key"
 ```
 
-This creates the admin user, demo user, faculties, courses, quizzes, and questions.
+This creates the admin user, demo user, 3 faculties, 6 courses, 8 quizzes, and 40 questions.
 
 ## Results
 
