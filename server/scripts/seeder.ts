@@ -9,14 +9,14 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '../../.env' });
 
-// Support MONGODB_URI (Atlas/Railway) and DB_URL + DB_NAME (local)
-const MONGODB_URI = process.env.MONGODB_URI || process.env.DB_URL || 'mongodb://localhost:27017';
+// Support MONGODB_URI, MONGODB_URL (Railway), DB_URL (local), or default
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGODB_URL || process.env.DB_URL || 'mongodb://localhost:27017';
 const DB_NAME = process.env.DB_NAME;
 
 async function seed() {
   try {
     const options: mongoose.ConnectOptions = {};
-    if (DB_NAME && !process.env.MONGODB_URI) {
+    if (DB_NAME && !process.env.MONGODB_URI && !process.env.MONGODB_URL) {
       options.dbName = DB_NAME;
     }
 

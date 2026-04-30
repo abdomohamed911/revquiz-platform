@@ -4,13 +4,12 @@ import mongoose from 'mongoose';
 const dbConnection = {
   connect: async () => {
     try {
-      // Support both MONGODB_URI (Atlas/Railway full connection string)
-      // and DB_URL + DB_NAME (local development)
-      const uri = process.env.MONGODB_URI || process.env.DB_URL || 'mongodb://localhost:27017';
+      // Support MONGODB_URI, MONGODB_URL (Railway), DB_URL (local), or default
+      const uri = process.env.MONGODB_URI || process.env.MONGODB_URL || process.env.DB_URL || 'mongodb://localhost:27017';
       const dbName = process.env.DB_NAME;
 
       const options: mongoose.ConnectOptions = {};
-      if (dbName && !process.env.MONGODB_URI) {
+      if (dbName && !process.env.MONGODB_URI && !process.env.MONGODB_URL) {
         options.dbName = dbName;
       }
 
