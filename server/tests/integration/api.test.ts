@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Import after dotenv is loaded
-import authRoutes from "@/modules/User/routes";
+import { authRouter } from "@/modules/User/routes";
 import facultyRoutes from "@/modules/Faculty/routes";
 import courseRoutes from "@/modules/Course/routes";
 import quizRoutes from "@/modules/Quiz/routes";
@@ -19,7 +19,7 @@ import globalError from "@/common/middleware/globalError";
 function createTestApp() {
   const app = express();
   app.use(express.json());
-  app.use("/auth", authRoutes);
+  app.use("/auth", authRouter);
   app.use("/faculties", facultyRoutes);
   app.use("/courses", courseRoutes);
   app.use("/quizzes", quizRoutes);
